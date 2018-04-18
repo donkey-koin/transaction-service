@@ -6,16 +6,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
+import java.util.Date;
 
 @RestController
 public class ValueController {
-    @Resource
-    private Value value;
-
+    //    private Value value;
+//
     @RequestMapping(value = "/value", method = RequestMethod.GET)
     @ResponseBody
     public Value getValue() {
-        return value;
+        return new Value(new Date(), 100);
     }
 }

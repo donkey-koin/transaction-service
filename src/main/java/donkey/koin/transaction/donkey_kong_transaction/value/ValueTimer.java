@@ -3,10 +3,10 @@ package donkey.koin.transaction.donkey_kong_transaction.value;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -16,15 +16,22 @@ public class ValueTimer {
 
     private static final Logger log = LoggerFactory.getLogger(ValueTimer.class);
 
-    @Resource
-    private Value value;
+    private final ValueRepository repository;
 
+    @Autowired
+    public ValueTimer(ValueRepository repository) {
+        this.repository = repository;
+    }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 60000, initialDelay = 5000)
     public void reportCurrentValue() {
-        int val = ThreadLocalRandom.current().nextInt(1000, 2000);
-        value.setCents(val);
-        value.setDate(new Date());
+        int cents = ThreadLocalRandom.current().nextInt(1000, 2000);
+        Value value = new Value(new Date(), cents);
+        repository.insert(value);
         log.info("Current Cryptocurrency Value: " + value.getCents() + " from time: " + value.getDate());
+        log.info("founded");
+        for (Value val : repository.findAll()) {
+            log.info(val.toString());
+        }
     }
 }

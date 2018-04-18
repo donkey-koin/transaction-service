@@ -1,13 +1,16 @@
 package donkey.koin.transaction.donkey_kong_transaction.value;
 
 import lombok.Data;
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.annotation.Id;
 
 import java.util.Date;
 
 @Data
-@Component
+@RequiredArgsConstructor
 public class Value {
-    private Date date;
-    private int cents;
+    private final Date date;
+    private final int cents;
+    @Id
+    private String id;
 }
