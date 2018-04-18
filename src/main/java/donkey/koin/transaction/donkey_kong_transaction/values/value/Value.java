@@ -4,13 +4,13 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @RequiredArgsConstructor
 public class Value {
     @Id
     private String id;
-    private final Date date;
+    private final LocalDateTime date;
     private final int cents;
 }

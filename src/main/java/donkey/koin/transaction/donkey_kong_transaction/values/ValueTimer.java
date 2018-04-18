@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -27,7 +27,7 @@ public class ValueTimer {
     @Scheduled(fixedRate = 60000, initialDelay = 5000)
     public void reportCurrentValue() {
         int cents = ThreadLocalRandom.current().nextInt(1000, 2000);
-        Value value = new Value(new Date(), cents);
+        Value value = new Value(LocalDateTime.now(), cents);
         repository.insert(value);
         log.info("Current Cryptocurrency Value: " + value.getCents() + " from time: " + value.getDate());
         log.info("founded");
