@@ -1,6 +1,6 @@
 package donkey.koin.transaction.donkey_kong_transaction;
 
-import donkey.koin.transaction.donkey_kong_transaction.value.ValueRepository;
+import donkey.koin.transaction.donkey_kong_transaction.values.ValueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

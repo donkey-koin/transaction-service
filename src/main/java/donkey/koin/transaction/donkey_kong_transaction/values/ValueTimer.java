@@ -1,6 +1,7 @@
-package donkey.koin.transaction.donkey_kong_transaction.value;
+package donkey.koin.transaction.donkey_kong_transaction.values;
 
 
+import donkey.koin.transaction.donkey_kong_transaction.values.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

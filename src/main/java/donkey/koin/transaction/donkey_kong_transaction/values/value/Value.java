@@ -1,4 +1,4 @@
-package donkey.koin.transaction.donkey_kong_transaction.value;
+package donkey.koin.transaction.donkey_kong_transaction.values.value;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -9,8 +9,8 @@ import java.util.Date;
 @Data
 @RequiredArgsConstructor
 public class Value {
-    private final Date date;
-    private final int cents;
     @Id
     private String id;
+    private final Date date;
+    private final int cents;
 }
