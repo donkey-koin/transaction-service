@@ -24,10 +24,10 @@ public class ValueTimer {
         this.repository = repository;
     }
 
-    @Scheduled(fixedRate = 60000, initialDelay = 5000)
+    @Scheduled(cron = "0 */1 * * * *")
     public void reportCurrentValue() {
         int cents = ThreadLocalRandom.current().nextInt(1000, 2000);
-        Value value = new Value(LocalDateTime.now(), cents);
+        Value value = new Value(LocalDateTime.now().withNano(0), cents);
         repository.insert(value);
         log.info("Current Cryptocurrency Value: " + value.getCents() + " from time: " + value.getDate());
         log.info("founded");
