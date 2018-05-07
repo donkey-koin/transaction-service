@@ -34,9 +34,5 @@ public class ValueTimer {
         Value value = new Value(instant, cents);
         repository.save(value);
         log.info("Current Cryptocurrency Value: " + value.getCents() + " from time: " + value.getDate());
-        log.info("founded: ");
-        for (Value val : repository.findAll()) {
-            log.info(val.toString());
-        }
     }
 }
