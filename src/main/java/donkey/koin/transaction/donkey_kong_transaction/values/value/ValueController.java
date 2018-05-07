@@ -41,8 +41,7 @@ public class ValueController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/newestValue")
-    public Value findNewestValueByDate(@RequestParam("date") String date) {
-        Instant instantFromString = valueService.getInstantFromString(date);
-        return valueService.findNewestByDate(instantFromString);
+    public Value findNewestValueByDate() {
+        return valueService.findNewestByDate(Instant.now());
     }
 }
