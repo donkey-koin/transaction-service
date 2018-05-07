@@ -1,7 +1,6 @@
 package donkey.koin.transaction.donkey_kong_transaction.values.value;
 
 
-import donkey.koin.transaction.donkey_kong_transaction.utils.TimeManagement;
 import donkey.koin.transaction.donkey_kong_transaction.values.ValueRepository;
 import donkey.koin.transaction.donkey_kong_transaction.values.ValueService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +35,9 @@ public class ValueController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/search")
-    public List<Value> findValuesByDate(@RequestParam("date") String date) {
+    public List<Value> findValuesByDate(@RequestParam("date") String date, @RequestParam("last") int last) {
         Instant instantFromString = valueService.getInstantFromString(date);
-        return repository.findAllByDateLessThanEqualOrderByDateDesc(instantFromString);
+        return valueService.findLastValues(instantFromString, last);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/newestValue")
