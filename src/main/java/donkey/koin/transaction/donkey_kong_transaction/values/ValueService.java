@@ -32,7 +32,7 @@ public class ValueService {
     }
 
     public List<Value> findLastValues(Instant instant, int lastN) {
-        return valueRepository.findAllByDateLessThanEqualOrderByDateDesc(instant).subList(0, lastN - 1);
+        return valueRepository.findAllByDateLessThanEqualOrderByDateDesc(instant).subList(0, lastN);
     }
 
 }
