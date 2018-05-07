@@ -3,6 +3,7 @@ package donkey.koin.transaction.donkey_kong_transaction.values.value;
 
 import donkey.koin.transaction.donkey_kong_transaction.utils.TimeManagement;
 import donkey.koin.transaction.donkey_kong_transaction.values.ValueRepository;
+import donkey.koin.transaction.donkey_kong_transaction.values.ValueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,10 +16,12 @@ import java.util.Optional;
 public class ValueController {
 
     private final ValueRepository repository;
+    private final ValueService valueService;
 
     @Autowired
-    public ValueController(ValueRepository repository) {
+    public ValueController(ValueRepository repository, ValueService valueService) {
         this.repository = repository;
+        this.valueService = valueService;
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -34,17 +37,13 @@ public class ValueController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/search")
     public List<Value> findValuesByDate(@RequestParam("date") String date) {
-        System.out.println(date);
-        Instant instant;
-
-        try {
-            instant = Instant.parse(date);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            instant = TimeManagement.deleteNano(Instant.now());
-        }
-
-        return this.repository.findAllByDate(instant);
+        Instant instantFromString = valueService.getInstantFromString(date);
+        return repository.findAllByDateLessThanEqualOrderByDateDesc(instantFromString);
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/newestValue")
+    public Value findNewestValueByDate(@RequestParam("date") String date) {
+        Instant instantFromString = valueService.getInstantFromString(date);
+        return valueService.findNewestByDate(instantFromString);
+    }
 }

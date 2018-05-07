@@ -13,4 +13,6 @@ public interface ValueRepository extends MongoRepository<Value, String> {  //, C
     List<Value> findAllByDate(Instant date);
 
     Optional<Value> findById(String id);
+
+    List<Value> findAllByDateLessThanEqualOrderByDateDesc(Instant date);
 }

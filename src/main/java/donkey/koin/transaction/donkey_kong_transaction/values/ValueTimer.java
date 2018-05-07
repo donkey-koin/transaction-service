@@ -25,7 +25,7 @@ public class ValueTimer {
         this.repository = repository;
     }
 
-    @Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(cron = "*/10 * * * * *")
     public void reportCurrentValue() {
         int cents = ThreadLocalRandom.current().nextInt(1000, 2000);
         Instant instant = Instant.now();
