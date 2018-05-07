@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class ValueService {
@@ -28,6 +29,10 @@ public class ValueService {
 
     public Value findNewestByDate(Instant instant) {
         return valueRepository.findAllByDateLessThanEqualOrderByDateDesc(instant).get(0);
+    }
+
+    public List<Value> findLastValues(Instant instant, int lastN) {
+        return valueRepository.findAllByDateLessThanEqualOrderByDateDesc(instant).subList(0, lastN - 1);
     }
 
 }
