@@ -32,7 +32,10 @@ public class ValueService {
     }
 
     public List<Value> findLastValues(Instant instant, int lastN) {
-        return valueRepository.findAllByDateLessThanEqualOrderByDateDesc(instant).subList(0, lastN);
+        try {
+            return valueRepository.findAllByDateLessThanEqualOrderByDateDesc(instant).subList(0, lastN);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
     }
-
 }
