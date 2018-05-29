@@ -1,4 +1,4 @@
-package donkey.koin.transaction.donkey_kong_transaction.values.value;
+package donkey.koin.transaction.donkey_kong_transaction.entities;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

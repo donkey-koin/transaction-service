@@ -1,7 +1,8 @@
-package donkey.koin.transaction.donkey_kong_transaction.values;
+package donkey.koin.transaction.donkey_kong_transaction.value;
 
+import donkey.koin.transaction.donkey_kong_transaction.entities.Value;
+import donkey.koin.transaction.donkey_kong_transaction.repo.ValueRepository;
 import donkey.koin.transaction.donkey_kong_transaction.utils.TimeManagement;
-import donkey.koin.transaction.donkey_kong_transaction.values.value.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

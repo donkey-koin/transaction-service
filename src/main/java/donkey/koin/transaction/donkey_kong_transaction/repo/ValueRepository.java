@@ -1,6 +1,6 @@
-package donkey.koin.transaction.donkey_kong_transaction.values;
+package donkey.koin.transaction.donkey_kong_transaction.repo;
 
-import donkey.koin.transaction.donkey_kong_transaction.values.value.Value;
+import donkey.koin.transaction.donkey_kong_transaction.entities.Value;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.lang.Nullable;
 
