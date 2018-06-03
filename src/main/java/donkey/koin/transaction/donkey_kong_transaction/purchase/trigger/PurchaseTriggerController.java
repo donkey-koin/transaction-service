@@ -20,10 +20,9 @@ public class PurchaseTriggerController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public void add(@RequestBody PurchaseTriggerDto purchaseTrigger) {
-        PurchaseTrigger trigger = new PurchaseTrigger(purchaseTrigger.getToken(),
-                purchaseTrigger.getValue(), purchaseTrigger.getCoinAmount(), purchaseTrigger.getAction());
-//        System.out.println(n);
+    public void add(@RequestBody PurchaseTriggerDto purchaseTrigger, @RequestHeader String authorization) {
+        PurchaseTrigger trigger = new PurchaseTrigger(authorization,
+                purchaseTrigger.getLimit(), purchaseTrigger.getCoinAmount(), purchaseTrigger.getAction());
 
         this.repository.save(trigger);
         System.out.println(trigger);

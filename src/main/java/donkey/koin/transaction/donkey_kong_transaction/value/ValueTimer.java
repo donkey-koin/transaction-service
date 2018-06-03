@@ -30,7 +30,7 @@ public class ValueTimer {
     public void reportCurrentValue() {
         int cents = ThreadLocalRandom.current().nextInt(1000, 2000);
         Instant instant = Instant.now();
-        System.out.println(instant);
+//        System.out.println(instant);
         instant = TimeManagement.deleteNano(instant);
         Value value = new Value(instant, cents);
         repository.save(value);

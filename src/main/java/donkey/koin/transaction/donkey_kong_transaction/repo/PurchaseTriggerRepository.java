@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface PurchaseTriggerRepository extends MongoRepository<PurchaseTrigger, String> {
 
-    List<PurchaseTrigger> findByValueGreaterThan(int value);
+    List<PurchaseTrigger> findByCoinAmountGreaterThan(int value);
 
-    List<PurchaseTrigger> findByValueLessThan(int value);
+    List<PurchaseTrigger> findByCoinAmountLessThan(int value);
 
 }

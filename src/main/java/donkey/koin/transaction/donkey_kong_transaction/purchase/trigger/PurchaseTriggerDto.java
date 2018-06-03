@@ -11,8 +11,8 @@ public class PurchaseTriggerDto {
     @JsonProperty("token")
     private String token;
 
-    @JsonProperty("value")
-    private int value;
+    @JsonProperty("limit")
+    private int limit;
 
     @JsonProperty("coinAmount")
     private int coinAmount;
@@ -23,8 +23,8 @@ public class PurchaseTriggerDto {
     public static PurchaseTriggerDto fromPurchaseTrigger(PurchaseTrigger purchaseTrigger) {
         PurchaseTriggerDto dto = new PurchaseTriggerDto();
         dto.setToken(purchaseTrigger.getToken());
-        dto.setValue(purchaseTrigger.getValue());
         dto.setCoinAmount(purchaseTrigger.getCoinAmount());
+        dto.setLimit(purchaseTrigger.getLimit());
         dto.setAction(purchaseTrigger.getAction());
         return dto;
     }
