@@ -8,5 +8,5 @@ import java.util.List;
 @Repository
 public interface BlockRepository extends MongoRepository<Block, String> {
     List<Block> findAllByOrderByOrder();
-    Block findFirstByOrderByOrder();
+    Block findFirstByOrderByOrderDesc();
 }

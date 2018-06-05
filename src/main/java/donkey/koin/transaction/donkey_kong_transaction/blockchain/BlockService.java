@@ -25,20 +25,20 @@ public class BlockService {
         this.atomicLong = new AtomicLong(count);
         if (count == 0) {
             Block block = new Block(0, "First block", "0");
+            block.setHash("0");
             blockRepository.insert(block);
         }
     }
 
-    public Boolean isChainValid() {
+    public Boolean isChainValid(List<Block> blockchain) {
         Block currentBlock;
         Block previousBlock;
-        List<Block> blockchain = blockRepository.findAllByOrderByOrder();
         //loop through blockchain to check hashes:
         for (int i = 1; i < blockchain.size(); i++) {
             currentBlock = blockchain.get(i);
             previousBlock = blockchain.get(i - 1);
             //compare registered hash and calculated hash:
-            if (!currentBlock.getHash().equals(calculateHash(currentBlock))) {
+            if (!currentBlock.getHash().equals(calculateHash(previousBlock))) {
                 log.info("Current Hashes not equal");
                 return false;
             }
@@ -56,7 +56,13 @@ public class BlockService {
     }
 
     public Block addBlock(String data) {
-        Block latestBlock = blockRepository.findFirstByOrderByOrder();
-        return blockRepository.insert(new Block(atomicLong.getAndIncrement(), data, latestBlock.getHash()));
+        Block latestBlock = blockRepository.findFirstByOrderByOrderDesc();
+        Block block = new Block(atomicLong.incrementAndGet(), data, latestBlock.getHash());
+        block.setHash(calculateHash(latestBlock));
+
+        List<Block> blockchain = blockRepository.findAllByOrderByOrder();
+        Boolean chainValid = isChainValid(blockchain);
+
+        return blockRepository.insert(block);
     }
 }
