@@ -20,12 +20,16 @@ public class PurchaseTriggerDto {
     @JsonProperty("action")
     private PurchaseTriggerAction action;
 
+    @JsonProperty
+    private String username;
+
     public static PurchaseTriggerDto fromPurchaseTrigger(PurchaseTrigger purchaseTrigger) {
         PurchaseTriggerDto dto = new PurchaseTriggerDto();
         dto.setToken(purchaseTrigger.getToken());
         dto.setCoinAmount(purchaseTrigger.getCoinAmount());
         dto.setLimit(purchaseTrigger.getLimit());
         dto.setAction(purchaseTrigger.getAction());
+        dto.setUsername(purchaseTrigger.getUsername());
         return dto;
     }
 

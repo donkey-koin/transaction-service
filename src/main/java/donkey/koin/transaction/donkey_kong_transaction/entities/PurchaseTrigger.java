@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @RequiredArgsConstructor
 public class PurchaseTrigger {
     private final String token;
+    private final String username;
     private final int limit;
     private final int coinAmount;
     private final PurchaseTriggerAction action;

@@ -1,5 +1,6 @@
 package donkey.koin.transaction.donkey_kong_transaction;
 
+import donkey.koin.transaction.donkey_kong_transaction.repo.PurchaseTriggerRepository;
 import donkey.koin.transaction.donkey_kong_transaction.repo.ValueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -16,9 +17,12 @@ public class DonkeyKongTransactionApplication implements CommandLineRunner {
 
     private final ValueRepository valueRepository;
 
+    private final PurchaseTriggerRepository purchaseTriggerRepository;
+
     @Autowired
-    public DonkeyKongTransactionApplication(ValueRepository valueRepository) {
+    public DonkeyKongTransactionApplication(ValueRepository valueRepository, PurchaseTriggerRepository purchaseTriggerRepository) {
         this.valueRepository = valueRepository;
+        this.purchaseTriggerRepository = purchaseTriggerRepository;
     }
 
     public static void main(String[] args) {
@@ -30,5 +34,6 @@ public class DonkeyKongTransactionApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         valueRepository.deleteAll();
+        purchaseTriggerRepository.deleteAll();
     }
 }
