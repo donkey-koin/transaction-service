@@ -10,13 +10,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @ComponentScan({"donkey.koin.transaction"})
-@SpringBootApplication//(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
+@SpringBootApplication
 public class DonkeyKongTransactionApplication implements CommandLineRunner {
 
     private final ValueRepository valueRepository;
     private final PurchaseTriggerRepository purchaseTriggerRepository;
 
-    public DonkeyKongTransactionApplication(ValueRepository valueRepository, PurchaseTriggerRepository purchaseTriggerRepository) {
+    public DonkeyKongTransactionApplication(ValueRepository valueRepository,
+                                            PurchaseTriggerRepository purchaseTriggerRepository) {
         this.valueRepository = valueRepository;
         this.purchaseTriggerRepository = purchaseTriggerRepository;
     }
@@ -26,7 +27,7 @@ public class DonkeyKongTransactionApplication implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         valueRepository.deleteAll();
         purchaseTriggerRepository.deleteAll();
     }

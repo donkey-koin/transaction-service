@@ -24,10 +24,11 @@ public class Block {
     private String data; //our data will be a simple message.
     private long timeStamp; //as number of milliseconds since 1/1/1970.
 
-    public Block(long order, String data, String previousHash) {
+    public Block(long order, String data, String previousHash, String hash) {
         this.data = data;
         this.previousHash = previousHash;
         this.timeStamp = Instant.now().toEpochMilli();
         this.order = order;
+        this.hash = hash;
     }
 }

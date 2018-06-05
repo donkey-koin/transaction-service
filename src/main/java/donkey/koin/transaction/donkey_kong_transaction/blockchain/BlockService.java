@@ -24,8 +24,7 @@ public class BlockService {
         long count = blockRepository.count();
         this.atomicLong = new AtomicLong(count);
         if (count == 0) {
-            Block block = new Block(0, "First block", "0");
-            block.setHash("0");
+            Block block = new Block(0, "First block", null, "0");
             blockRepository.insert(block);
         }
     }
@@ -57,12 +56,7 @@ public class BlockService {
 
     public Block addBlock(String data) {
         Block latestBlock = blockRepository.findFirstByOrderByOrderDesc();
-        Block block = new Block(atomicLong.incrementAndGet(), data, latestBlock.getHash());
-        block.setHash(calculateHash(latestBlock));
-
-        List<Block> blockchain = blockRepository.findAllByOrderByOrder();
-        Boolean chainValid = isChainValid(blockchain);
-
-        return blockRepository.insert(block);
+        Block newBlock = new Block(atomicLong.incrementAndGet(), data, latestBlock.getHash(), calculateHash(latestBlock));
+        return blockRepository.insert(newBlock);
     }
 }

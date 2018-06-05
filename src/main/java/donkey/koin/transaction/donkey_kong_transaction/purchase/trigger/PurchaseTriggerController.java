@@ -3,9 +3,11 @@ package donkey.koin.transaction.donkey_kong_transaction.purchase.trigger;
 
 import donkey.koin.transaction.donkey_kong_transaction.entities.PurchaseTrigger;
 import donkey.koin.transaction.donkey_kong_transaction.repo.PurchaseTriggerRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/triggers")
 public class PurchaseTriggerController {
@@ -23,6 +25,6 @@ public class PurchaseTriggerController {
                 purchaseTrigger.getLimit(), purchaseTrigger.getCoinAmount(), purchaseTrigger.getAction());
 
         this.repository.save(trigger);
-        System.out.println(trigger);
+        log.info(trigger.toString());
     }
 }
