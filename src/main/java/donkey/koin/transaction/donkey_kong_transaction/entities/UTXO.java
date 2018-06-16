@@ -1,10 +1,10 @@
 package donkey.koin.transaction.donkey_kong_transaction.entities;
 
-import donkey.koin.transaction.donkey_kong_transaction.inprogres.Transaction;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.security.PublicKey;
 import java.util.Arrays;
 
 @Data
@@ -15,7 +15,8 @@ public class UTXO implements Comparable<UTXO> {
     private String id;
     private byte[] txHash;
     private int index;
-    private Transaction.Output transactionOutput;
+    private double value;
+    private PublicKey address;
 
     public UTXO(byte[] txHash, int index) {
         this.txHash = Arrays.copyOf(txHash, txHash.length);

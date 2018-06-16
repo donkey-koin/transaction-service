@@ -51,10 +51,11 @@ public class TxHandler {
               return false;
             }
 
-            Transaction.Output previousTxOutput = oUtxo.get().getTransactionOutput();
-            if (previousTxOutput == null) { return false; }
+            PublicKey publicKey = oUtxo.get().getAddress();
+            if (publicKey == null) {
+                return false;
+            }
 
-            PublicKey publicKey = previousTxOutput.address;
             byte[] message = tx.getRawDataToSign(i);
             byte[] signature = input.signature;
             //rule number 2
@@ -68,7 +69,7 @@ public class TxHandler {
             usedUTXO.put(utxo, true);
 
             //saving this value for rule number 5
-            this.totalInputSum += previousTxOutput.value;
+            this.totalInputSum += oUtxo.get().getValue();
         }
 
         return true;
@@ -113,7 +114,8 @@ public class TxHandler {
             int index = 0;
             for (Transaction.Output output : tx.getOutputs()) {
                 UTXO utxo = new UTXO(txHash, index);
-                utxo.setTransactionOutput(output);
+                utxo.setAddress(output.address);
+                utxo.setValue(output.value);
                 index += 1;
                 this.utxoRepository.save(utxo);
             }
@@ -121,5 +123,5 @@ public class TxHandler {
 
         return validTxs.toArray(new Transaction[validTxs.size()]);
     }
-
+    
 }
