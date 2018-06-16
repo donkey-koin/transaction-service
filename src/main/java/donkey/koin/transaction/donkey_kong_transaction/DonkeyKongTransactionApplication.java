@@ -1,7 +1,9 @@
 package donkey.koin.transaction.donkey_kong_transaction;
 
+import donkey.koin.transaction.donkey_kong_transaction.koin.KoinManager;
 import donkey.koin.transaction.donkey_kong_transaction.repo.PurchaseTriggerRepository;
 import donkey.koin.transaction.donkey_kong_transaction.repo.ValueRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,8 +15,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 public class DonkeyKongTransactionApplication implements CommandLineRunner {
 
+    @Autowired
+    KoinManager koinManager;
+
     private final ValueRepository valueRepository;
     private final PurchaseTriggerRepository purchaseTriggerRepository;
+
 
     public DonkeyKongTransactionApplication(ValueRepository valueRepository,
                                             PurchaseTriggerRepository purchaseTriggerRepository) {
@@ -30,5 +36,6 @@ public class DonkeyKongTransactionApplication implements CommandLineRunner {
     public void run(String... args) {
         valueRepository.deleteAll();
         purchaseTriggerRepository.deleteAll();
+        koinManager.createInitialTransaction(1000);
     }
 }
