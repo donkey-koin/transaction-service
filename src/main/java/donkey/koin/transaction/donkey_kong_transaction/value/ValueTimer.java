@@ -1,6 +1,8 @@
 package donkey.koin.transaction.donkey_kong_transaction.value;
 
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import donkey.koin.transaction.donkey_kong_transaction.entities.PurchaseTrigger;
 import donkey.koin.transaction.donkey_kong_transaction.entities.Value;
 import donkey.koin.transaction.donkey_kong_transaction.purchase.trigger.PurchaseTriggerAction;
@@ -11,15 +13,14 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -33,6 +34,10 @@ public class ValueTimer {
 
     private final PurchaseTriggerRepository triggerRepository;
 
+    //    private volatile int fuelPrice = 50000;
+    private int bitcoinPrice = 500000;
+
+
     @Autowired
     public ValueTimer(ValueRepository repository, PurchaseTriggerRepository triggerRepository) {
         this.repository = repository;
@@ -41,16 +46,16 @@ public class ValueTimer {
 
     @Scheduled(cron = "*/10 * * * * *")
     public void reportCurrentValue() {
-        int cents = ThreadLocalRandom.current().nextInt(1000, 2000);
+        int randomCents = ThreadLocalRandom.current().nextInt(100, 200);
+        int donkeyKoinCalculatedPrice = bitcoinPrice + randomCents;
+
         Instant instant = Instant.now();
 //        System.out.println(instant);
         instant = TimeManagement.deleteNano(instant);
-        Value value = new Value(instant, cents);
+        Value value = new Value(instant, donkeyKoinCalculatedPrice);
         repository.save(value);
         log.info("Current Cryptocurrency Value: " + value.getCents() + " from time: " + value.getDate());
-
         checkForOrderedPurchase(value);
-
     }
 
     public void checkForOrderedPurchase(Value value) {
@@ -73,8 +78,6 @@ public class ValueTimer {
             jsonString = new JSONObject()
                     .put("username", trigger.getUsername())
                     .put("moneyAmount", trigger.getCoinAmount())
-//                    .put("lastKoinValue", value.getCents())
-//                    .put("transactionTime", value.getDate())
                     .toString();
 
             request = new HttpEntity<>(jsonString, headers);
@@ -88,5 +91,28 @@ public class ValueTimer {
             }
         }
     }
+
+    @Scheduled(cron = "*/60 * * * * *")
+    public int countDonkeyKoinValue() {
+        RestTemplate restTemplate = new RestTemplate();
+        String bitcoinUrl = "https://api.coindesk.com/v1/bpi/currentprice.json";
+        HttpEntity<String> request;
+        HttpHeaders headers;
+        headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64)");
+        request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                bitcoinUrl, HttpMethod.GET, request, String.class);
+        JsonObject o = new JsonParser().parse(Objects.requireNonNull(response.getBody())).getAsJsonObject();
+        try {
+            this.bitcoinPrice = (int) (o.get("bpi").getAsJsonObject().get("EUR").getAsJsonObject().get("rate_float").getAsDouble() * 100);
+        } catch (Exception e) {
+            System.out.println("parsing bitcoin reponse error");
+        }
+        return 1;
+    }
+
 
 }
