@@ -50,7 +50,6 @@ public class ValueTimer {
         int donkeyKoinCalculatedPrice = bitcoinPrice + randomCents;
 
         Instant instant = Instant.now();
-//        System.out.println(instant);
         instant = TimeManagement.deleteNano(instant);
         Value value = new Value(instant, donkeyKoinCalculatedPrice);
         repository.save(value);
@@ -58,14 +57,46 @@ public class ValueTimer {
         checkForOrderedPurchase(value);
     }
 
-    public void checkForOrderedPurchase(Value value) {
-        //FOR BUYING
-        List<PurchaseTrigger> purchaseTriggers = triggerRepository.findByLimitGreaterThanEqualAndActionEquals(value.getCents(), PurchaseTriggerAction.BUY);
-        System.out.println(purchaseTriggers);
+    private void checkForOrderedPurchase(Value value) {
+        checkBuyTriggers(value);
+        checkSellTriggers(value);
+    }
 
-        //check for coin amount
+    @Scheduled(cron = "*/60 * * * * *")
+    public void countDonkeyKoinValue() {
         RestTemplate restTemplate = new RestTemplate();
-        String purchaseUrl = exchangeServiceUrl + "purchase";
+        String bitcoinUrl = "https://api.coindesk.com/v1/bpi/currentprice.json";
+        HttpEntity<String> request;
+        HttpHeaders headers;
+        headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64)");
+        request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                bitcoinUrl, HttpMethod.GET, request, String.class);
+        JsonObject o = new JsonParser().parse(Objects.requireNonNull(response.getBody())).getAsJsonObject();
+        try {
+            this.bitcoinPrice = (int) (o.get("bpi").getAsJsonObject().get("EUR").getAsJsonObject().get("rate_float").getAsDouble() * 100);
+        } catch (Exception e) {
+            System.out.println("parsing bitcoin reponse error");
+        }
+    }
+
+
+    private void checkBuyTriggers(Value value) {
+        List<PurchaseTrigger> purchaseTriggers = triggerRepository.findByLimitGreaterThanEqualAndActionEquals(value.getCents(), PurchaseTriggerAction.BUY);
+        postToOrchestration(purchaseTriggers, "purchase");
+    }
+
+    private void checkSellTriggers(Value value) {
+        List<PurchaseTrigger> purchaseTriggers = triggerRepository.findByLimitLessThanEqualAndActionEquals(value.getCents(), PurchaseTriggerAction.SELL);
+        postToOrchestration(purchaseTriggers, "sell");
+    }
+
+    private void postToOrchestration(List<PurchaseTrigger> purchaseTriggers, String endpoint) {
+        RestTemplate restTemplate = new RestTemplate();
+        String purchaseUrl = exchangeServiceUrl + endpoint;
         HttpEntity<String> request;
         String jsonString;
         String response;
@@ -91,28 +122,5 @@ public class ValueTimer {
             }
         }
     }
-
-    @Scheduled(cron = "*/60 * * * * *")
-    public int countDonkeyKoinValue() {
-        RestTemplate restTemplate = new RestTemplate();
-        String bitcoinUrl = "https://api.coindesk.com/v1/bpi/currentprice.json";
-        HttpEntity<String> request;
-        HttpHeaders headers;
-        headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64)");
-        request = new HttpEntity<>(headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                bitcoinUrl, HttpMethod.GET, request, String.class);
-        JsonObject o = new JsonParser().parse(Objects.requireNonNull(response.getBody())).getAsJsonObject();
-        try {
-            this.bitcoinPrice = (int) (o.get("bpi").getAsJsonObject().get("EUR").getAsJsonObject().get("rate_float").getAsDouble() * 100);
-        } catch (Exception e) {
-            System.out.println("parsing bitcoin reponse error");
-        }
-        return 1;
-    }
-
 
 }
