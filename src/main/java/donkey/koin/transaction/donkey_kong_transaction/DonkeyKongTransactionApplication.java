@@ -36,6 +36,5 @@ public class DonkeyKongTransactionApplication implements CommandLineRunner {
     public void run(String... args) {
         valueRepository.deleteAll();
         purchaseTriggerRepository.deleteAll();
-        koinManager.createInitialTransaction(1000);
     }
 }

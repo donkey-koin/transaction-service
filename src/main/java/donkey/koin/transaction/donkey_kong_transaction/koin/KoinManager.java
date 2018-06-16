@@ -2,8 +2,10 @@ package donkey.koin.transaction.donkey_kong_transaction.koin;
 
 
 import donkey.koin.transaction.donkey_kong_transaction.inprogres.Transaction;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.ArrayList;
@@ -14,6 +16,9 @@ public class KoinManager {
 
     private KeyPair keyPair;
     private List<Transaction> allTransactions = new ArrayList<>();
+
+    @Value("${donkey.koin.initial.value}")
+    private int initialAmount;
 
     public KoinManager() {
         try {
@@ -26,9 +31,10 @@ public class KoinManager {
         }
     }
 
-    public void createInitialTransaction(Integer koinAmount) {
+    @PostConstruct
+    public void createInitialTransaction() {
         Transaction t = new Transaction();
-        Transaction.Output o = t.new Output(koinAmount, keyPair.getPublic());
+        Transaction.Output o = t.new Output(initialAmount, keyPair.getPublic());
         ArrayList<Transaction.Input> inputs = new ArrayList<>();
         ArrayList<Transaction.Output> outputs = new ArrayList<>();
         outputs.add(o);
@@ -37,6 +43,4 @@ public class KoinManager {
         t.calculateHash();
         allTransactions.add(t);
     }
-
-
 }
