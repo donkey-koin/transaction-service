@@ -1,38 +1,28 @@
-package donkey.koin.transaction.donkey_kong_transaction.inprogres;
+package donkey.koin.transaction.donkey_kong_transaction.entities;
+
+import donkey.koin.transaction.donkey_kong_transaction.inprogres.Transaction;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Arrays;
 
+@Data
+@Document
 public class UTXO implements Comparable<UTXO> {
 
-    /** Hash of the transaction from which this UTXO originates */
+    @Id
+    private String id;
     private byte[] txHash;
-
-    /** Index of the corresponding output in said transaction */
     private int index;
+    private Transaction.Output transactionOutput;
 
-    /**
-     * Creates a new UTXO corresponding to the output with index <index> in the transaction whose
-     * hash is {@code txHash}
-     */
     public UTXO(byte[] txHash, int index) {
         this.txHash = Arrays.copyOf(txHash, txHash.length);
         this.index = index;
     }
 
-    /** @return the transaction hash of this UTXO */
-    public byte[] getTxHash() {
-        return txHash;
-    }
-
-    /** @return the index of this UTXO */
-    public int getIndex() {
-        return index;
-    }
-
-    /**
-     * Compares this UTXO to the one specified by {@code other}, considering them equal if they have
-     * {@code txHash} arrays with equal contents and equal {@code index} values
-     */
+    @Override
     public boolean equals(Object other) {
         if (other == null) {
             return false;
@@ -53,10 +43,7 @@ public class UTXO implements Comparable<UTXO> {
         return true;
     }
 
-    /**
-     * Simple implementation of a UTXO hashCode that respects equality of UTXOs // (i.e.
-     * utxo1.equals(utxo2) => utxo1.hashCode() == utxo2.hashCode())
-     */
+    @Override
     public int hashCode() {
         int hash = 1;
         hash = hash * 17 + index;
@@ -64,7 +51,7 @@ public class UTXO implements Comparable<UTXO> {
         return hash;
     }
 
-    /** Compares this UTXO to the one specified by {@code utxo} */
+    @Override
     public int compareTo(UTXO utxo) {
         byte[] hash = utxo.txHash;
         int in = utxo.index;
