@@ -28,7 +28,7 @@ public class TestController {
         generator.initialize(512);
         Transaction.Input i = t.new Input("previous".getBytes(), 0);
         KeyPair keyPair = generator.generateKeyPair();
-        Transaction.Output o = t.new Output(5, keyPair.getPublic());
+        Transaction.Output o = t.new Output(5, keyPair.getPublic().getEncoded());
         ArrayList<Transaction.Input> inputs = new ArrayList<>();
         inputs.add(i);
         ArrayList<Transaction.Output> outputs = new ArrayList<>();

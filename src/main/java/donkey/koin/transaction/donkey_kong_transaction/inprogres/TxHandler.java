@@ -96,10 +96,6 @@ public class TxHandler {
         return publicKey;
     }
 
-    public static PublicKey getRsaPublicKeyKeyFromBytes(byte[] bytes) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(bytes));
-    }
-
     private boolean validateRuleNumber4And5(Transaction tx) {
         double outputSum = 0;
 
@@ -116,6 +112,14 @@ public class TxHandler {
         }
 
         return this.totalInputSum >= outputSum;
+    }
+
+    public static PublicKey getRsaPublicKeyKeyFromBytes(byte[] bytes) {
+        try {
+            return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(bytes));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**

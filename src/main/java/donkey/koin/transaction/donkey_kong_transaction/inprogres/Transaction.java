@@ -69,9 +69,9 @@ public class Transaction {
         /** the address or public key of the recipient */
         public PublicKey address;
 
-        public Output(double v, PublicKey addr) {
-            value = v;
-            address = addr;
+        public Output(double value, byte[] address) {
+            this.value = value;
+            this.address = TxHandler.getRsaPublicKeyKeyFromBytes(address);
         }
     }
 
@@ -92,7 +92,7 @@ public class Transaction {
     }
 
     public void addOutput(double value, PublicKey address) {
-        Output op = new Output(value, address);
+        Output op = new Output(value, address.getEncoded());
         outputs.add(op);
     }
 

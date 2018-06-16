@@ -12,5 +12,5 @@ public interface UTXORepository extends MongoRepository<UTXO, String> {
     Optional<UTXO> findByTxHash(byte[] txHash);
     void deleteByTxHash(byte[] txHash);
 
-    Optional<UTXO> findByAddressEquals(byte[] adress);
+    List<UTXO> findAllByAddressEquals(byte[] adress);
 }
