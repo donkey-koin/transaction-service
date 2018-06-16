@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Component
 public class KoinManager {
@@ -93,6 +95,16 @@ public class KoinManager {
         transaction.addOutput(coinAmount,receipent);
         transaction.calculateHash();
         transactionRepository.save(transaction);
+
+        AtomicInteger outputIndex = new AtomicInteger(0);
+        List<UTXO> newUtxos = transaction.getOutputs().stream().map(output -> {
+            UTXO utxo = new UTXO(transaction.getHash(),outputIndex.getAndIncrement());
+            utxo.setValue(output.getValue());
+            utxo.setAddress(output.getAddress());
+            return utxo;
+        }).collect(Collectors.toList());
+
+        utxoRepository.saveAll(newUtxos);
 
     }
 
