@@ -1,5 +1,10 @@
 package donkey.koin.transaction.donkey_kong_transaction.inprogres;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -7,9 +12,25 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+@Getter
+@Setter
+@Document
 public class Transaction {
 
+    @Id
+    /** hash of the transaction, its unique id */
+    private String hashId;
+    private byte[] hash;
+    private ArrayList<Input> inputs;
+    private ArrayList<Output> outputs;
+
+    @Getter
+    @Setter
+    @Document
     public class Input {
+
+        @Id
+        private String id;
         /** hash of the Transaction whose output is being used */
         public byte[] prevTxHash;
         /** used output's index in the previous transaction */
@@ -33,7 +54,13 @@ public class Transaction {
         }
     }
 
+    @Getter
+    @Setter
+    @Document
     public class Output {
+
+        @Id
+        private String id;
         /** value in bitcoins of the output */
         public double value;
         /** the address or public key of the recipient */
@@ -45,20 +72,15 @@ public class Transaction {
         }
     }
 
-    /** hash of the transaction, its unique id */
-    private byte[] hash;
-    private ArrayList<Input> inputs;
-    private ArrayList<Output> outputs;
-
     public Transaction() {
-        inputs = new ArrayList<Input>();
-        outputs = new ArrayList<Output>();
+        inputs = new ArrayList<>();
+        outputs = new ArrayList<>();
     }
 
     public Transaction(Transaction tx) {
         hash = tx.hash.clone();
-        inputs = new ArrayList<Input>(tx.inputs);
-        outputs = new ArrayList<Output>(tx.outputs);
+        inputs = new ArrayList(tx.inputs);
+        outputs = new ArrayList<>(tx.outputs);
     }
 
     public void addInput(byte[] prevTxHash, int outputIndex) {
@@ -88,7 +110,7 @@ public class Transaction {
 
     public byte[] getRawDataToSign(int index) {
         // ith input and all outputs
-        ArrayList<Byte> sigData = new ArrayList<Byte>();
+        ArrayList<Byte> sigData = new ArrayList<>();
         if (index > inputs.size())
             return null;
         Input in = inputs.get(index);
@@ -124,7 +146,7 @@ public class Transaction {
     }
 
     public byte[] getRawTx() {
-        ArrayList<Byte> rawTx = new ArrayList<Byte>();
+        ArrayList<Byte> rawTx = new ArrayList<>();
         for (Input in : inputs) {
             byte[] prevTxHash = in.prevTxHash;
             ByteBuffer b = ByteBuffer.allocate(Integer.SIZE / 8);
@@ -160,7 +182,7 @@ public class Transaction {
         return tx;
     }
 
-    public void finalize() {
+    public void calculateHash() {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(getRawTx());
