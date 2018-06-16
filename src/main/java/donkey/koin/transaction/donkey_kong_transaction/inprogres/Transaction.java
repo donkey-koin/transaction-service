@@ -1,6 +1,7 @@
 package donkey.koin.transaction.donkey_kong_transaction.inprogres;
 
 import donkey.koin.transaction.donkey_kong_transaction.entities.UTXO;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -10,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Arrays;
 

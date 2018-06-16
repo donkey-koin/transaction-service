@@ -51,17 +51,17 @@ public class TxHandler {
               return false;
             }
 
-            PublicKey publicKey = oUtxo.get().getAddress();
-            if (publicKey == null) {
-                return false;
-            }
+//            PublicKey publicKey = oUtxo.get().getAddress();
+//            if (publicKey == null) {
+//                return false;
+//            }
 
             byte[] message = tx.getRawDataToSign(i);
             byte[] signature = input.signature;
             //rule number 2
-            if (!Crypto.verifySignature(publicKey, message, signature)) {
-              return false;
-            }
+//            if (!Crypto.verifySignature(publicKey, message, signature)) {
+//              return false;
+//            }
 
             //rule number 3
             if (usedUTXO.containsKey(utxo)) { return false; }
@@ -114,7 +114,7 @@ public class TxHandler {
             int index = 0;
             for (Transaction.Output output : tx.getOutputs()) {
                 UTXO utxo = new UTXO(txHash, index);
-                utxo.setAddress(output.address);
+                utxo.setAddress(output.address.getEncoded());
                 utxo.setValue(output.value);
                 index += 1;
                 this.utxoRepository.save(utxo);

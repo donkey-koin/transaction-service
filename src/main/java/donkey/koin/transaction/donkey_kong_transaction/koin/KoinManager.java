@@ -2,17 +2,24 @@ package donkey.koin.transaction.donkey_kong_transaction.koin;
 
 
 import donkey.koin.transaction.donkey_kong_transaction.inprogres.Transaction;
+import donkey.koin.transaction.donkey_kong_transaction.repo.UTXORepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class KoinManager {
+
+    @Autowired
+    UTXORepository utxoRepository;
 
     private KeyPair keyPair;
     private List<Transaction> allTransactions = new ArrayList<>();
@@ -43,4 +50,10 @@ public class KoinManager {
         t.calculateHash();
         allTransactions.add(t);
     }
+
+    public void addTransaction(Map<PublicKey,Double> owners, PublicKey receipent, double coinAmount) {
+//        owners.entrySet().forEach();
+    }
+
+
 }
