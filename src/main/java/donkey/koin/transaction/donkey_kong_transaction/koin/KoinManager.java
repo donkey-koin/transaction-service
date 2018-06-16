@@ -48,7 +48,7 @@ public class KoinManager {
     @PostConstruct
     public void createInitialTransaction() {
         Transaction t = new Transaction();
-        Transaction.Output o = t.new Output(initialAmount, keyPair.getPublic().getEncoded());
+        Transaction.Output o = new Transaction.Output(initialAmount, keyPair.getPublic().getEncoded());
         ArrayList<Transaction.Input> inputs = new ArrayList<>();
         ArrayList<Transaction.Output> outputs = new ArrayList<>();
         outputs.add(o);

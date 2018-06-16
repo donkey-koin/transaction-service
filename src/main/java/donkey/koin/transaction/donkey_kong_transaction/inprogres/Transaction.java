@@ -1,17 +1,16 @@
 package donkey.koin.transaction.donkey_kong_transaction.inprogres;
 
 import donkey.koin.transaction.donkey_kong_transaction.entities.UTXO;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -29,10 +28,8 @@ public class Transaction {
 
     @Getter
     @Setter
-    @Document
-    public class Input {
+    public static class Input {
 
-        @Id
         private String id;
         /** hash of the Transaction whose output is being used */
         public byte[] prevTxHash;
@@ -41,12 +38,12 @@ public class Transaction {
         /** the signature produced to check validity */
         public byte[] signature;
 
-        public Input(byte[] prevHash, int index) {
-            if (prevHash == null)
-                prevTxHash = null;
+        public Input(byte[] prevTxHash, int outputIndex) {
+            if (prevTxHash== null)
+                this.prevTxHash = null;
             else
-                prevTxHash = Arrays.copyOf(prevHash, prevHash.length);
-            outputIndex = index;
+                this.prevTxHash = Arrays.copyOf(prevTxHash, prevTxHash.length);
+            outputIndex = outputIndex;
         }
 
         public void addSignature(byte[] sig) {
@@ -59,19 +56,18 @@ public class Transaction {
 
     @Getter
     @Setter
-    @Document
-    public class Output {
+    public static class Output {
 
-        @Id
         private String id;
         /** value in bitcoins of the output */
         public double value;
         /** the address or public key of the recipient */
-        public PublicKey address;
+
+        public byte[] address;
 
         public Output(double value, byte[] address) {
             this.value = value;
-            this.address = TxHandler.getRsaPublicKeyKeyFromBytes(address);
+            this.address = address;
         }
     }
 
@@ -130,7 +126,7 @@ public class Transaction {
             ByteBuffer bo = ByteBuffer.allocate(Double.SIZE / 8);
             bo.putDouble(op.value);
             byte[] value = bo.array();
-            byte[] addressBytes = op.address.getEncoded();
+            byte[] addressBytes = op.address;
             for (int i = 0; i < value.length; i++)
                 sigData.add(value[i]);
 
@@ -169,7 +165,7 @@ public class Transaction {
             ByteBuffer b = ByteBuffer.allocate(Double.SIZE / 8);
             b.putDouble(op.value);
             byte[] value = b.array();
-            byte[] addressBytes = op.address.getEncoded();
+            byte[] addressBytes = op.address;
             for (int i = 0; i < value.length; i++) {
                 rawTx.add(value[i]);
             }

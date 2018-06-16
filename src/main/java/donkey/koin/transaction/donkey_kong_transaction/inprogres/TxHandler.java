@@ -147,7 +147,7 @@ public class TxHandler {
             int index = 0;
             for (Transaction.Output output : tx.getOutputs()) {
                 UTXO utxo = new UTXO(txHash, index);
-                utxo.setAddress(output.address.getEncoded());
+                utxo.setAddress(output.address);
                 utxo.setValue(output.value);
                 index += 1;
                 this.utxoRepository.save(utxo);

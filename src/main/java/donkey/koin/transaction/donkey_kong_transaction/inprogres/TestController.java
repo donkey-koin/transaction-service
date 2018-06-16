@@ -26,9 +26,9 @@ public class TestController {
         t.setHash("test".getBytes());
         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
         generator.initialize(512);
-        Transaction.Input i = t.new Input("previous".getBytes(), 0);
+        Transaction.Input i = new Transaction.Input("previous".getBytes(), 0);
         KeyPair keyPair = generator.generateKeyPair();
-        Transaction.Output o = t.new Output(5, keyPair.getPublic().getEncoded());
+        Transaction.Output o = new Transaction.Output(5, keyPair.getPublic().getEncoded());
         ArrayList<Transaction.Input> inputs = new ArrayList<>();
         inputs.add(i);
         ArrayList<Transaction.Output> outputs = new ArrayList<>();
