@@ -87,6 +87,7 @@ public class Transaction {
     public Transaction() {
         inputs = new ArrayList<>();
         outputs = new ArrayList<>();
+        timestamp = Instant.now();
     }
 
     public Transaction(Transaction tx) {

@@ -14,7 +14,10 @@ import javax.annotation.PostConstruct;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PublicKey;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -141,8 +144,9 @@ public class KoinManager {
 
     private byte[] getPreviousTransactionHash() {
         return transactionRepository.findAll().stream()
-                    .max(comparing(Transaction::getTimestamp))
-                    .map(Transaction::getHash).get();
+                .max(comparing(Transaction::getTimestamp))
+                .map(Transaction::getHash)
+                .orElse(new byte[]{0});
     }
 
     private List<UTXO> createNewUtxos(Transaction transaction) {
