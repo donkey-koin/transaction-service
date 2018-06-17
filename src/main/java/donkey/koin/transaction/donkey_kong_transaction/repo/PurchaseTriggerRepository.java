@@ -11,5 +11,4 @@ public interface PurchaseTriggerRepository extends MongoRepository<PurchaseTrigg
     List<PurchaseTrigger> findByLimitGreaterThanEqualAndActionEquals(int value, PurchaseTriggerAction trigger);
 
     List<PurchaseTrigger> findByLimitLessThanEqualAndActionEquals(int value, PurchaseTriggerAction trigger);
-
 }

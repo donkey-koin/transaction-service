@@ -1,7 +1,7 @@
 package donkey.koin.transaction.donkey_kong_transaction;
 
+import donkey.koin.transaction.donkey_kong_transaction.crypto.Transaction;
 import donkey.koin.transaction.donkey_kong_transaction.entities.UTXO;
-import donkey.koin.transaction.donkey_kong_transaction.inprogres.Transaction;
 import donkey.koin.transaction.donkey_kong_transaction.koin.KoinManager;
 import donkey.koin.transaction.donkey_kong_transaction.repo.TransactionRepository;
 import donkey.koin.transaction.donkey_kong_transaction.repo.UTXORepository;
@@ -12,12 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PublicKey;
-import java.security.spec.RSAPublicKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +45,7 @@ public class DonkeyKongTransactionApplicationTests {
 
         // when
         List<Transaction> transactions = transactionRepository.findAll();
-
-
+        
         // then
         assert transactions.size() == 1;
         assert transactions.get(0).getOutputs().size() == 1;
@@ -75,7 +71,7 @@ public class DonkeyKongTransactionApplicationTests {
         assert transactions.get(1).getOutputs().get(1).value == 4.56d;
     }
 
-     @Test
+    @Test
     public void adds_correct_multiple_transactions() {
         // given
         koinManager.createInitialTransaction();
@@ -85,12 +81,12 @@ public class DonkeyKongTransactionApplicationTests {
         KeyPair keyPair2 = generateKeyPair();
 
         map1.put(koinManager.getKeyPair().getPublic(), 500d);
-        map2.put(keyPair1.getPublic(),400d);
-        map2.put(koinManager.getKeyPair().getPublic(),200d);
+        map2.put(keyPair1.getPublic(), 400d);
+        map2.put(koinManager.getKeyPair().getPublic(), 200d);
 
         // when
         koinManager.addTransaction(map1, keyPair1.getPublic(), 500d);
-        koinManager.addTransaction(map2,keyPair2.getPublic(),600d);
+        koinManager.addTransaction(map2, keyPair2.getPublic(), 600d);
         List<Transaction> transactions = transactionRepository.findAll();
 
         // then

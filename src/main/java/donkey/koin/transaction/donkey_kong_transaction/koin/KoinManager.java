@@ -1,8 +1,8 @@
 package donkey.koin.transaction.donkey_kong_transaction.koin;
 
 
+import donkey.koin.transaction.donkey_kong_transaction.crypto.Transaction;
 import donkey.koin.transaction.donkey_kong_transaction.entities.UTXO;
-import donkey.koin.transaction.donkey_kong_transaction.inprogres.Transaction;
 import donkey.koin.transaction.donkey_kong_transaction.repo.TransactionRepository;
 import donkey.koin.transaction.donkey_kong_transaction.repo.UTXORepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +59,7 @@ public class KoinManager {
         t.calculateHash();
         transactionRepository.save(t);
 
-        UTXO utxo = new UTXO(t.getHash(),0);
+        UTXO utxo = new UTXO(t.getHash(), 0);
         utxo.setAddress(keyPair.getPublic().getEncoded());
         utxo.setValue(o.getValue());
         utxoRepository.save(utxo);
@@ -88,26 +88,26 @@ public class KoinManager {
 
         utxoRepository.deleteAll(utxosToUtilize);
 
-        for (UTXO utxo:utxosToUtilize) {
-            transaction.addInput(utxo.getTxHash(),utxo.getIndex());
+        for (UTXO utxo : utxosToUtilize) {
+            transaction.addInput(utxo.getTxHash(), utxo.getIndex());
         }
 
-        transaction.addOutput(coinAmount,receipent);
+        transaction.addOutput(coinAmount, receipent);
         transaction.calculateHash();
         transactionRepository.save(transaction);
 
         AtomicInteger outputIndex = new AtomicInteger(0);
-        List<UTXO> newUtxos = transaction.getOutputs().stream().map(output -> {
-            UTXO utxo = new UTXO(transaction.getHash(),outputIndex.getAndIncrement());
-            utxo.setValue(output.getValue());
-            utxo.setAddress(output.getAddress());
-            return utxo;
-        }).collect(Collectors.toList());
+        List<UTXO> newUtxos = transaction.getOutputs().stream()
+                .map(output -> {
+                    UTXO utxo = new UTXO(transaction.getHash(), outputIndex.getAndIncrement());
+                    utxo.setValue(output.getValue());
+                    utxo.setAddress(output.getAddress());
+                    return utxo;
+                })
+                .collect(Collectors.toList());
 
         utxoRepository.saveAll(newUtxos);
-
     }
-
 
     public KeyPair getKeyPair() {
         return keyPair;

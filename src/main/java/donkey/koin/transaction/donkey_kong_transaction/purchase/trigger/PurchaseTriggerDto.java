@@ -32,5 +32,4 @@ public class PurchaseTriggerDto {
         dto.setUsername(purchaseTrigger.getUsername());
         return dto;
     }
-
 }

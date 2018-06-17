@@ -1,12 +1,10 @@
-package donkey.koin.transaction.donkey_kong_transaction.inprogres;
+package donkey.koin.transaction.donkey_kong_transaction.crypto;
 
 import donkey.koin.transaction.donkey_kong_transaction.entities.UTXO;
 import donkey.koin.transaction.donkey_kong_transaction.repo.UTXORepository;
 
 import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.HashMap;

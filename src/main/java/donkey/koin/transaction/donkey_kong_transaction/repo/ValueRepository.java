@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-public interface ValueRepository extends MongoRepository<Value, String> {  //, CrudRepository<Value,String> {
+public interface ValueRepository extends MongoRepository<Value, String> {
     @Nullable
     List<Value> findAllByDate(Instant date);
 

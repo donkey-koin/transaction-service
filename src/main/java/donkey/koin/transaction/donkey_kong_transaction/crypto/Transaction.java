@@ -1,10 +1,9 @@
-package donkey.koin.transaction.donkey_kong_transaction.inprogres;
+package donkey.koin.transaction.donkey_kong_transaction.crypto;
 
 import donkey.koin.transaction.donkey_kong_transaction.entities.UTXO;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.nio.ByteBuffer;
@@ -31,19 +30,26 @@ public class Transaction {
     public static class Input {
 
         private String id;
-        /** hash of the Transaction whose output is being used */
+        /**
+         * hash of the Transaction whose output is being used
+         */
         public byte[] prevTxHash;
-        /** used output's index in the previous transaction */
+        /**
+         * used output's index in the previous transaction
+         */
         public int outputIndex;
-        /** the signature produced to check validity */
+        /**
+         * the signature produced to check validity
+         */
         public byte[] signature;
 
         public Input(byte[] prevTxHash, int outputIndex) {
-            if (prevTxHash== null)
+            if (prevTxHash == null) {
                 this.prevTxHash = null;
-            else
+            } else {
                 this.prevTxHash = Arrays.copyOf(prevTxHash, prevTxHash.length);
-            outputIndex = outputIndex;
+            }
+            this.outputIndex = outputIndex;
         }
 
         public void addSignature(byte[] sig) {
@@ -59,9 +65,13 @@ public class Transaction {
     public static class Output {
 
         private String id;
-        /** value in bitcoins of the output */
+        /**
+         * value in bitcoins of the output
+         */
         public double value;
-        /** the address or public key of the recipient */
+        /**
+         * the address or public key of the recipient
+         */
 
         public byte[] address;
 
