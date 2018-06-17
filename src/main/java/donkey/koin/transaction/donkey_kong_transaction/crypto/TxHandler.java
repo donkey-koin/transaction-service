@@ -2,6 +2,7 @@ package donkey.koin.transaction.donkey_kong_transaction.crypto;
 
 import donkey.koin.transaction.donkey_kong_transaction.entities.UTXO;
 import donkey.koin.transaction.donkey_kong_transaction.repo.UTXORepository;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -112,14 +113,6 @@ public class TxHandler {
         return this.totalInputSum >= outputSum;
     }
 
-    public static PublicKey getRsaPublicKeyKeyFromBytes(byte[] bytes) {
-        try {
-            return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(bytes));
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     /**
      * Handles each epoch by receiving an unordered array of proposed transactions, checking each
      * transaction for correctness, returning a mutually valid array of accepted transactions, and
@@ -155,4 +148,15 @@ public class TxHandler {
         return validTxs.toArray(new Transaction[validTxs.size()]);
     }
 
+    public static PublicKey getPublicKeyFromBoxedBytes(Byte[] bytes){
+        return getRsaPublicKeyKeyFromBytes(ArrayUtils.toPrimitive(bytes));
+    }
+
+    public static PublicKey getRsaPublicKeyKeyFromBytes(byte[] bytes) {
+        try {
+            return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(bytes));
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

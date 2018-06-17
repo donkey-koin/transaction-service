@@ -10,17 +10,20 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 public class DonkeyKongTransactionApplicationTests {
 
     @Autowired
@@ -45,7 +48,7 @@ public class DonkeyKongTransactionApplicationTests {
 
         // when
         List<Transaction> transactions = transactionRepository.findAll();
-        
+
         // then
         assert transactions.size() == 1;
         assert transactions.get(0).getOutputs().size() == 1;
@@ -57,7 +60,7 @@ public class DonkeyKongTransactionApplicationTests {
         // given
         koinManager.createInitialTransaction();
         Map<PublicKey, Double> map = new HashMap<>();
-        KeyPair keyPair1 = generateKeyPair();
+        KeyPair keyPair1 = TestUtil.generateKeyPair();
         map.put(koinManager.getKeyPair().getPublic(), 4.56d);
 
         // when
@@ -77,8 +80,8 @@ public class DonkeyKongTransactionApplicationTests {
         koinManager.createInitialTransaction();
         Map<PublicKey, Double> map1 = new HashMap<>();
         Map<PublicKey, Double> map2 = new HashMap<>();
-        KeyPair keyPair1 = generateKeyPair();
-        KeyPair keyPair2 = generateKeyPair();
+        KeyPair keyPair1 = TestUtil.generateKeyPair();
+        KeyPair keyPair2 = TestUtil.generateKeyPair();
 
         map1.put(koinManager.getKeyPair().getPublic(), 500d);
         map2.put(keyPair1.getPublic(), 400d);
@@ -102,7 +105,7 @@ public class DonkeyKongTransactionApplicationTests {
         // given
         koinManager.createInitialTransaction();
         Map<PublicKey, Double> map = new HashMap<>();
-        KeyPair keyPair1 = generateKeyPair();
+        KeyPair keyPair1 = TestUtil.generateKeyPair();
         map.put(koinManager.getKeyPair().getPublic(), 4.56d);
 
         // when
@@ -114,18 +117,4 @@ public class DonkeyKongTransactionApplicationTests {
         assert utxos.get(0).getValue() == 995.44d;
         assert utxos.get(1).getValue() == 4.56d;
     }
-
-    private KeyPair generateKeyPair() {
-        KeyPair keyPair;
-        try {
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-            kpg.initialize(512);
-            keyPair = kpg.generateKeyPair();
-        } catch (Exception e) {
-            e.printStackTrace();
-            keyPair = null;
-        }
-        return keyPair;
-    }
-
 }
