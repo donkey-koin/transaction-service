@@ -1,23 +1,24 @@
 package donkey.koin.transaction.donkey_kong_transaction.koin;
 
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import donkey.koin.transaction.donkey_kong_transaction.crypto.Transaction;
 import donkey.koin.transaction.donkey_kong_transaction.entities.UTXO;
 import donkey.koin.transaction.donkey_kong_transaction.repo.TransactionRepository;
 import donkey.koin.transaction.donkey_kong_transaction.repo.UTXORepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -36,7 +37,7 @@ public class KoinManager {
     private List<Transaction> allTransactions = new ArrayList<>();
 
     @Value("${donkey.koin.initial.value}")
-    private int initialAmount;
+    private double initialAmount;
 
     public KoinManager() {
         try {
@@ -65,6 +66,17 @@ public class KoinManager {
         utxo.setAddress(keyPair.getPublic().getEncoded());
         utxo.setValue(o.getValue());
         utxoRepository.save(utxo);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String orchUrl = "http://localhost:5000/init";
+        HttpEntity<InitTransaction> request;
+        HttpHeaders headers;
+        headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        request = new HttpEntity<>(new InitTransaction(initialAmount,keyPair.getPublic().getEncoded()),headers);
+
+        restTemplate.exchange(orchUrl, HttpMethod.POST, request, InitTransaction.class);
+
     }
 
     @Transactional
