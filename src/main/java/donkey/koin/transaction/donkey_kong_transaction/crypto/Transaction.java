@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -24,6 +25,8 @@ public class Transaction {
     private byte[] hash;
     private ArrayList<Input> inputs;
     private ArrayList<Output> outputs;
+    private Instant timestamp;
+    private byte[] previousHash;
 
     @Getter
     @Setter

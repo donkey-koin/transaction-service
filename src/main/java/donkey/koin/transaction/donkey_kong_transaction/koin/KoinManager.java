@@ -14,12 +14,11 @@ import javax.annotation.PostConstruct;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparing;
 
 @Component
 public class KoinManager {
@@ -94,6 +93,8 @@ public class KoinManager {
 
         transaction.addOutput(coinAmount, receipent);
         transaction.calculateHash();
+        transaction.setPreviousHash(getPreviousTransactionHash());
+
         transactionRepository.save(transaction);
 
         AtomicInteger outputIndex = new AtomicInteger(0);
@@ -132,9 +133,16 @@ public class KoinManager {
         owners.forEach((buyerKey, amountToOutput) -> transaction.addOutput(amountToOutput, buyerKey));
 
         transaction.calculateHash();
+        transaction.setPreviousHash(getPreviousTransactionHash());
 
         List<UTXO> newUtxos = createNewUtxos(transaction);
         utxoRepository.saveAll(newUtxos);
+    }
+
+    private byte[] getPreviousTransactionHash() {
+        return transactionRepository.findAll().stream()
+                    .max(comparing(Transaction::getTimestamp))
+                    .map(Transaction::getHash).get();
     }
 
     private List<UTXO> createNewUtxos(Transaction transaction) {
