@@ -1,6 +1,7 @@
 package donkey.koin.transaction.donkey_kong_transaction;
 
 import donkey.koin.transaction.donkey_kong_transaction.crypto.Transaction;
+import donkey.koin.transaction.donkey_kong_transaction.crypto.TxHandler;
 import donkey.koin.transaction.donkey_kong_transaction.entities.UTXO;
 import donkey.koin.transaction.donkey_kong_transaction.koin.KoinManager;
 import donkey.koin.transaction.donkey_kong_transaction.repo.TransactionRepository;
@@ -15,10 +16,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.security.KeyPair;
 import java.security.PublicKey;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
 @RunWith(SpringRunner.class)
@@ -116,5 +116,51 @@ public class DonkeyKongTransactionApplicationTests {
         assert utxos.size() == 2;
         assert utxos.get(0).getValue() == 995.44d;
         assert utxos.get(1).getValue() == 4.56d;
+    }
+
+
+    @Test
+    public void sell_transaction() {
+        //given
+        koinManager.createInitialTransaction();
+
+        Map<PublicKey, Double> sellersMap = new HashMap<>();
+        KeyPair keyPairSeller = TestUtil.generateKeyPair();
+        KeyPair keyPairBuyer = TestUtil.generateKeyPair();
+
+        PublicKey sellerPublicKey = keyPairSeller.getPublic();
+        PublicKey buyerPublicKey = keyPairBuyer.getPublic();
+        PublicKey koinManagerPublicKey = koinManager.getKeyPair().getPublic();
+
+        List<UTXO> sellerUtxos = new ArrayList<>();
+        sellersMap.put(buyerPublicKey, 5d);
+        sellersMap.put(koinManagerPublicKey, 1d);
+
+        sellerUtxos.add(createUtxoFor(keyPairSeller, 5));
+        sellerUtxos.add(createUtxoFor(keyPairSeller, 2));
+        utxoRepository.saveAll(sellerUtxos);
+
+        // when
+        koinManager.sellTransaction(sellersMap, sellerPublicKey, 6);
+
+        //then
+        List<UTXO> utxos = utxoRepository.findAll();
+
+        assertThat(utxos)
+                .hasSize(4)
+                .extracting("value")
+                .containsExactlyInAnyOrder(1000.0, 5.0, 1.0, 1.0);
+
+//        assert Objects.equals(TxHandler.getRsaPublicKeyKeyFromBytes(utxos.get(0).getAddress()), koinManagerPublicKey);
+//        assert Objects.equals(TxHandler.getRsaPublicKeyKeyFromBytes(utxos.get(1).getAddress()), sellerPublicKey);
+//        assert Objects.equals(TxHandler.getRsaPublicKeyKeyFromBytes(utxos.get(2).getAddress()), koinManagerPublicKey);
+//        assert Objects.equals(TxHandler.getRsaPublicKeyKeyFromBytes(utxos.get(3).getAddress()), buyerPublicKey);
+    }
+
+    private UTXO createUtxoFor(KeyPair keyPairBuyer, double amount) {
+        UTXO utxo = new UTXO(new byte[]{}, 0);
+        utxo.setValue(amount);
+        utxo.setAddress(keyPairBuyer.getPublic().getEncoded());
+        return utxo;
     }
 }

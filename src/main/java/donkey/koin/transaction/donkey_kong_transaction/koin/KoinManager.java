@@ -97,7 +97,49 @@ public class KoinManager {
         transactionRepository.save(transaction);
 
         AtomicInteger outputIndex = new AtomicInteger(0);
-        List<UTXO> newUtxos = transaction.getOutputs().stream()
+        List<UTXO> newUtxos = createNewUtxos(transaction);
+
+        utxoRepository.saveAll(newUtxos);
+    }
+
+    @Transactional
+    public void sellTransaction(Map<PublicKey, Double> owners, PublicKey seller, double coinAmount) {
+        List<UTXO> utxosToUtilize = new LinkedList<>();
+        Transaction transaction = new Transaction();
+        List<UTXO> allSellersUtxos = utxoRepository.findAllByAddressEquals(seller.getEncoded());
+
+        double amountAfterUtxoUtilisation = coinAmount;
+
+        for (UTXO sellerUtxo : allSellersUtxos) {
+            double value = sellerUtxo.getValue();
+            utxosToUtilize.add(sellerUtxo);
+            amountAfterUtxoUtilisation -= value;
+
+            if (amountAfterUtxoUtilisation <= 0) {
+                if (amountAfterUtxoUtilisation < 0) {
+                    transaction.addOutput(Math.abs(amountAfterUtxoUtilisation), seller);
+                }
+                break;
+            }
+        }
+
+        utxoRepository.deleteAll(utxosToUtilize);
+
+        for (UTXO utxo : utxosToUtilize) {
+            transaction.addInput(utxo.getTxHash(), utxo.getIndex());
+        }
+
+        owners.forEach((buyerKey, amountToOutput) -> transaction.addOutput(amountToOutput, buyerKey));
+
+        transaction.calculateHash();
+
+        List<UTXO> newUtxos = createNewUtxos(transaction);
+        utxoRepository.saveAll(newUtxos);
+    }
+
+    private List<UTXO> createNewUtxos(Transaction transaction) {
+        AtomicInteger outputIndex = new AtomicInteger(0);
+        return transaction.getOutputs().stream()
                 .map(output -> {
                     UTXO utxo = new UTXO(transaction.getHash(), outputIndex.getAndIncrement());
                     utxo.setValue(output.getValue());
@@ -105,8 +147,6 @@ public class KoinManager {
                     return utxo;
                 })
                 .collect(Collectors.toList());
-
-        utxoRepository.saveAll(newUtxos);
     }
 
     public KeyPair getKeyPair() {

@@ -24,10 +24,11 @@ public class TransactionApplyController {
 
     private final KoinManager koinManager;
 
-    @Autowired
     private final TransactionRepository transactionRepository;
 
-    public TransactionApplyController(KoinManager koinManager, TransactionRepository transactionRepository) {
+    @Autowired
+    public TransactionApplyController(KoinManager koinManager,
+                                      TransactionRepository transactionRepository) {
         this.koinManager = koinManager;
         this.transactionRepository = transactionRepository;
     }
@@ -35,6 +36,12 @@ public class TransactionApplyController {
     @RequestMapping(method = POST)
     public void potentiallyPersistTransaction(@RequestBody PotentialTransaction potentialTransaction) {
         koinManager.addTransaction(potentialTransaction.getOutputsMap(), potentialTransaction.getRecipientPublicKey(),
+                potentialTransaction.getAmount());
+    }
+
+    @RequestMapping(method = POST, value = "/sell")
+    public void sellTransaction(@RequestBody PotentialTransaction potentialTransaction) {
+        koinManager.sellTransaction(potentialTransaction.getOutputsMap(), potentialTransaction.getRecipientPublicKey(),
                 potentialTransaction.getAmount());
     }
 
