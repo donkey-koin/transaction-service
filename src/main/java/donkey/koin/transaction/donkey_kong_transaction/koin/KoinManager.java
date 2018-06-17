@@ -52,6 +52,8 @@ public class KoinManager {
 
     @PostConstruct
     public void createInitialTransaction() {
+        transactionRepository.deleteAll();
+        utxoRepository.deleteAll();
         Transaction t = new Transaction();
         Transaction.Output o = new Transaction.Output(initialAmount, keyPair.getPublic().getEncoded());
         ArrayList<Transaction.Input> inputs = new ArrayList<>();
