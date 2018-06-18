@@ -2,15 +2,13 @@ package donkey.koin.transaction.donkey_kong_transaction.crypto;
 
 import donkey.koin.transaction.donkey_kong_transaction.koin.KoinManager;
 import donkey.koin.transaction.donkey_kong_transaction.repo.TransactionRepository;
+import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static donkey.koin.transaction.donkey_kong_transaction.crypto.TransactionApplyController.TRANSACTION_ENDPOINT;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -46,16 +44,19 @@ public class TransactionApplyController {
     }
 
     @RequestMapping(method = GET)
-    List<Transaction> getAllTransactions() {
-        List<Transaction> transactions = this.transactionRepository.findAll();
+    public List<Transaction> getAllTransactions() {
+        List<Transaction> transactions = transactionRepository.findAll();
         System.out.println(transactions);
         return transactions;
     }
 
-    @RequestMapping(method = GET, value = "/{publicKey}")
-    List<Transaction> getMyTransactions(@PathVariable byte[] publicKey) {
-        List<Transaction> transactions = this.transactionRepository.findAll();
-        List<Transaction> myTransactions = new ArrayList<>();
+    @RequestMapping(method = POST, path = "/find")
+    public Set<Transaction> getMyTransactions(@RequestBody Map<String, Byte[]> bytes) {
+        byte[] publicKey = ArrayUtils.toPrimitive(bytes.get("publicKey"));
+
+        Set<Transaction> transactions = new LinkedHashSet<>(transactionRepository.findAll());
+        Set<Transaction> myTransactions = new LinkedHashSet<>();
+
         for (Transaction transaction : transactions) {
             for (Transaction.Output output : transaction.getOutputs()) {
                 if (Arrays.equals(output.getAddress(), publicKey)) {
@@ -63,8 +64,13 @@ public class TransactionApplyController {
                     break;
                 }
             }
+            for (Transaction.Input input : transaction.getInputs()) {
+                if (Arrays.equals(input.getSignature(), publicKey)) {
+                    myTransactions.add(transaction);
+                    break;
+                }
+            }
         }
         return myTransactions;
     }
-
 }
