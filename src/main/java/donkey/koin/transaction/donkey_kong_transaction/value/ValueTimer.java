@@ -99,7 +99,6 @@ public class ValueTimer {
         String purchaseUrl = exchangeServiceUrl + endpoint;
         HttpEntity<String> request;
         String jsonString;
-        String response;
         HttpHeaders headers;
         for (PurchaseTrigger trigger : purchaseTriggers) {
             headers = new HttpHeaders();
@@ -110,14 +109,16 @@ public class ValueTimer {
                     .put("username", trigger.getUsername())
                     .put("moneyAmount", trigger.getCoinAmount())
                     .toString();
-
             request = new HttpEntity<>(jsonString, headers);
-            System.out.println(request);
-            try {
-                response = restTemplate.postForObject(purchaseUrl, request, String.class);
-                System.out.println(response);
 
-                triggerRepository.delete(trigger);
+            try {
+                try {
+                    restTemplate.postForObject(purchaseUrl, request, String.class);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    triggerRepository.delete(trigger);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
