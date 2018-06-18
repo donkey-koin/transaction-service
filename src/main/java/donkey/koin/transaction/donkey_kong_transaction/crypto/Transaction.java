@@ -96,9 +96,8 @@ public class Transaction {
         outputs = new ArrayList<>(tx.outputs);
     }
 
-    public void addInput(byte[] prevTxHash, int outputIndex) {
-        Input in = new Input(prevTxHash, outputIndex);
-        inputs.add(in);
+    public void addInput(Input input) {
+        inputs.add(input);
     }
 
     public void addOutput(double value, PublicKey address) {

@@ -105,7 +105,9 @@ public class KoinManager {
         utxoRepository.deleteAll(utxosToUtilize);
 
         for (UTXO utxo : utxosToUtilize) {
-            transaction.addInput(utxo.getTxHash(), utxo.getIndex());
+            Transaction.Input input = new Transaction.Input(utxo.getTxHash(),utxo.getIndex());
+            input.setSignature(utxo.getAddress());
+            transaction.addInput(input);
         }
 
         transaction.addOutput(coinAmount, receipent);
@@ -144,7 +146,9 @@ public class KoinManager {
         utxoRepository.deleteAll(utxosToUtilize);
 
         for (UTXO utxo : utxosToUtilize) {
-            transaction.addInput(utxo.getTxHash(), utxo.getIndex());
+            Transaction.Input input = new Transaction.Input(utxo.getTxHash(),utxo.getIndex());
+            input.setSignature(utxo.getAddress());
+            transaction.addInput(input);
         }
 
         owners.forEach((buyerKey, amountToOutput) -> transaction.addOutput(amountToOutput, buyerKey));
