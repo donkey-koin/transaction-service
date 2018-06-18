@@ -85,12 +85,12 @@ public class ValueTimer {
 
 
     private void checkBuyTriggers(Value value) {
-        List<PurchaseTrigger> purchaseTriggers = triggerRepository.findByLimitGreaterThanEqualAndActionEquals(value.getCents(), PurchaseTriggerAction.BUY);
+        List<PurchaseTrigger> purchaseTriggers = triggerRepository.findByLimitGreaterThanEqualAndActionEquals(value.getCents() / 100, PurchaseTriggerAction.BUY);
         postToOrchestration(purchaseTriggers, "purchase");
     }
 
     private void checkSellTriggers(Value value) {
-        List<PurchaseTrigger> purchaseTriggers = triggerRepository.findByLimitLessThanEqualAndActionEquals(value.getCents(), PurchaseTriggerAction.SELL);
+        List<PurchaseTrigger> purchaseTriggers = triggerRepository.findByLimitLessThanEqualAndActionEquals(value.getCents() / 100, PurchaseTriggerAction.SELL);
         postToOrchestration(purchaseTriggers, "sell");
     }
 
