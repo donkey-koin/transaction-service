@@ -1,9 +1,11 @@
 package donkey.koin.transaction.donkey_kong_transaction.crypto;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import donkey.koin.transaction.donkey_kong_transaction.koin.KoinManager;
+import donkey.koin.transaction.donkey_kong_transaction.koin.WalletUpdateAction;
 import donkey.koin.transaction.donkey_kong_transaction.repo.TransactionRepository;
 import org.apache.commons.lang.ArrayUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +26,6 @@ public class TransactionApplyController {
 
     private final TransactionRepository transactionRepository;
 
-    @Autowired
     public TransactionApplyController(KoinManager koinManager,
                                       TransactionRepository transactionRepository) {
         this.koinManager = koinManager;
@@ -32,15 +33,21 @@ public class TransactionApplyController {
     }
 
     @RequestMapping(method = POST)
-    public void potentiallyPersistTransaction(@RequestBody PotentialTransaction potentialTransaction) {
-        koinManager.addTransaction(potentialTransaction.getOutputsMap(), potentialTransaction.getRecipientPublicKey(),
+    public String potentiallyPersistTransaction(@RequestBody PotentialTransaction potentialTransaction) {
+        List<WalletUpdateAction> walletUpdateActions = koinManager.addTransaction(potentialTransaction.getOutputsMap(), potentialTransaction.getRecipientPublicKey(),
                 potentialTransaction.getAmount());
+
+        Gson gsonBuilder = new GsonBuilder().setPrettyPrinting().create();
+        String json = gsonBuilder.toJson(walletUpdateActions);
+        return json;
     }
 
     @RequestMapping(method = POST, value = "/sell")
-    public void sellTransaction(@RequestBody PotentialTransaction potentialTransaction) {
-        koinManager.sellTransaction(potentialTransaction.getOutputsMap(), potentialTransaction.getRecipientPublicKey(),
+    public List<WalletUpdateAction> sellTransaction(@RequestBody PotentialTransaction potentialTransaction) {
+        List<WalletUpdateAction> walletUpdateActions = koinManager.sellTransaction(potentialTransaction.getOutputsMap(), potentialTransaction.getRecipientPublicKey(),
                 potentialTransaction.getAmount());
+
+        return walletUpdateActions;
     }
 
     @RequestMapping(method = GET)

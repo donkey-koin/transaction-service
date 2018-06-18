@@ -1,15 +1,16 @@
 package donkey.koin.transaction.donkey_kong_transaction.koin;
 
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import donkey.koin.transaction.donkey_kong_transaction.crypto.Transaction;
 import donkey.koin.transaction.donkey_kong_transaction.entities.UTXO;
 import donkey.koin.transaction.donkey_kong_transaction.repo.TransactionRepository;
 import donkey.koin.transaction.donkey_kong_transaction.repo.UTXORepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +19,10 @@ import javax.annotation.PostConstruct;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PublicKey;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -34,7 +38,6 @@ public class KoinManager {
     TransactionRepository transactionRepository;
 
     private KeyPair keyPair;
-    private List<Transaction> allTransactions = new ArrayList<>();
 
     @Value("${donkey.koin.initial.value}")
     private double initialAmount;
@@ -75,14 +78,16 @@ public class KoinManager {
         HttpHeaders headers;
         headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        request = new HttpEntity<>(new InitTransaction(initialAmount,keyPair.getPublic().getEncoded()),headers);
+        request = new HttpEntity<>(new InitTransaction(initialAmount, keyPair.getPublic().getEncoded()), headers);
 
         restTemplate.exchange(orchUrl, HttpMethod.POST, request, InitTransaction.class);
 
     }
 
     @Transactional
-    public void addTransaction(Map<PublicKey, Double> owners, PublicKey receipent, double coinAmount) {
+    public List<WalletUpdateAction> addTransaction(Map<PublicKey, Double> owners, PublicKey recipient, double coinAmount) {
+        List<WalletUpdateAction> walletUpdateActions = new ArrayList<>();
+
         List<UTXO> utxosToUtilize = new LinkedList<>();
         Transaction transaction = new Transaction();
         for (PublicKey publicKey : owners.keySet()) {
@@ -90,40 +95,52 @@ public class KoinManager {
             List<UTXO> ownerUtxos = utxoRepository.findAllByAddressEquals(publicKey.getEncoded());
             Double ownerCoins = 0d;
 
+            WalletUpdateAction walletUpdateAction = new WalletUpdateAction(publicKey.getEncoded(), 0);
+
             for (UTXO utxo : ownerUtxos) {
                 ownerCoins += utxo.getValue();
                 utxosToUtilize.add(utxo);
                 if (ownerCoins >= owners.get(publicKey)) {
                     if (ownerCoins > owners.get(publicKey)) {
                         transaction.addOutput(ownerCoins - owners.get(publicKey), publicKey);
+                        walletUpdateAction.addAmount(-owners.get(publicKey));
                     }
                     break;
+
                 }
+                walletUpdateAction.addAmount(-owners.get(publicKey));
             }
+            walletUpdateActions.add(walletUpdateAction);
         }
 
         utxoRepository.deleteAll(utxosToUtilize);
 
         for (UTXO utxo : utxosToUtilize) {
-            Transaction.Input input = new Transaction.Input(utxo.getTxHash(),utxo.getIndex());
+            Transaction.Input input = new Transaction.Input(utxo.getTxHash(), utxo.getIndex());
             input.setSignature(utxo.getAddress());
             transaction.addInput(input);
         }
 
-        transaction.addOutput(coinAmount, receipent);
+        transaction.addOutput(coinAmount, recipient);
         transaction.calculateHash();
         transaction.setPreviousHash(getPreviousTransactionHash());
 
         transactionRepository.save(transaction);
 
-        AtomicInteger outputIndex = new AtomicInteger(0);
         List<UTXO> newUtxos = createNewUtxos(transaction);
 
         utxoRepository.saveAll(newUtxos);
+
+        WalletUpdateAction buyerWalletUpdateAction = new WalletUpdateAction(recipient.getEncoded(), coinAmount);
+        walletUpdateActions.add(buyerWalletUpdateAction);
+
+        return walletUpdateActions;
     }
 
     @Transactional
-    public void sellTransaction(Map<PublicKey, Double> owners, PublicKey seller, double coinAmount) {
+    public List<WalletUpdateAction> sellTransaction(Map<PublicKey, Double> owners, PublicKey seller, double coinAmount) {
+        List<WalletUpdateAction> walletUpdateActions = new ArrayList<>();
+
         List<UTXO> utxosToUtilize = new LinkedList<>();
         Transaction transaction = new Transaction();
         List<UTXO> allSellersUtxos = utxoRepository.findAllByAddressEquals(seller.getEncoded());
@@ -146,18 +163,26 @@ public class KoinManager {
         utxoRepository.deleteAll(utxosToUtilize);
 
         for (UTXO utxo : utxosToUtilize) {
-            Transaction.Input input = new Transaction.Input(utxo.getTxHash(),utxo.getIndex());
+            Transaction.Input input = new Transaction.Input(utxo.getTxHash(), utxo.getIndex());
             input.setSignature(utxo.getAddress());
             transaction.addInput(input);
         }
 
-        owners.forEach((buyerKey, amountToOutput) -> transaction.addOutput(amountToOutput, buyerKey));
+        owners.forEach((buyerKey, amountToOutput) -> {
+            transaction.addOutput(amountToOutput, buyerKey);
+            walletUpdateActions.add(new WalletUpdateAction(buyerKey.getEncoded(), amountToOutput));
+        });
 
         transaction.calculateHash();
         transaction.setPreviousHash(getPreviousTransactionHash());
 
         List<UTXO> newUtxos = createNewUtxos(transaction);
         utxoRepository.saveAll(newUtxos);
+
+        WalletUpdateAction buyerWalletUpdateAction = new WalletUpdateAction(seller.getEncoded(), -coinAmount);
+        walletUpdateActions.add(buyerWalletUpdateAction);
+
+        return walletUpdateActions;
     }
 
     private byte[] getPreviousTransactionHash() {
