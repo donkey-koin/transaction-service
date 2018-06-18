@@ -95,7 +95,8 @@ public class KoinManager {
             List<UTXO> ownerUtxos = utxoRepository.findAllByAddressEquals(publicKey.getEncoded());
             Double ownerCoins = 0d;
 
-            WalletUpdateAction walletUpdateAction = new WalletUpdateAction(publicKey.getEncoded(), 0, lastKoinValue);
+            WalletUpdateAction walletUpdateAction = new WalletUpdateAction(publicKey.getEncoded(), -owners.get(publicKey), lastKoinValue);
+            walletUpdateActions.add(walletUpdateAction);
 
             for (UTXO utxo : ownerUtxos) {
                 ownerCoins += utxo.getValue();
@@ -103,14 +104,11 @@ public class KoinManager {
                 if (ownerCoins >= owners.get(publicKey)) {
                     if (ownerCoins > owners.get(publicKey)) {
                         transaction.addOutput(ownerCoins - owners.get(publicKey), publicKey);
-                        walletUpdateAction.addAmount(-owners.get(publicKey));
                     }
                     break;
 
                 }
-                walletUpdateAction.addAmount(-owners.get(publicKey));
             }
-            walletUpdateActions.add(walletUpdateAction);
         }
 
         utxoRepository.deleteAll(utxosToUtilize);
