@@ -67,7 +67,7 @@ public class RestTest {
         MiniTransaction miniTransaction = new MiniTransaction(koinManagerPublicKey, valueToTakeFromManager);
 
         List<MiniTransaction> usersToTakeMoneyFromToAmount = Arrays.asList(miniTransaction);
-        PotentialTransaction potentialTransaction = new PotentialTransaction(usersToTakeMoneyFromToAmount, recipientPublicKey, valueToTakeFromManager);
+        PotentialTransaction potentialTransaction = new PotentialTransaction(usersToTakeMoneyFromToAmount, recipientPublicKey, valueToTakeFromManager, 0);
 
         Gson gsonBuilder = new GsonBuilder().setPrettyPrinting().create();
         String json = gsonBuilder.toJson(potentialTransaction);

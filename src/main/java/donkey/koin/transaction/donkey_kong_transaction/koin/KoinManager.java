@@ -85,7 +85,7 @@ public class KoinManager {
     }
 
     @Transactional
-    public List<WalletUpdateAction> addTransaction(Map<PublicKey, Double> owners, PublicKey recipient, double coinAmount) {
+    public List<WalletUpdateAction> addTransaction(Map<PublicKey, Double> owners, PublicKey recipient, double coinAmount, double lastKoinValue) {
         List<WalletUpdateAction> walletUpdateActions = new ArrayList<>();
 
         List<UTXO> utxosToUtilize = new LinkedList<>();
@@ -95,7 +95,7 @@ public class KoinManager {
             List<UTXO> ownerUtxos = utxoRepository.findAllByAddressEquals(publicKey.getEncoded());
             Double ownerCoins = 0d;
 
-            WalletUpdateAction walletUpdateAction = new WalletUpdateAction(publicKey.getEncoded(), 0);
+            WalletUpdateAction walletUpdateAction = new WalletUpdateAction(publicKey.getEncoded(), 0, lastKoinValue);
 
             for (UTXO utxo : ownerUtxos) {
                 ownerCoins += utxo.getValue();
@@ -131,14 +131,14 @@ public class KoinManager {
 
         utxoRepository.saveAll(newUtxos);
 
-        WalletUpdateAction buyerWalletUpdateAction = new WalletUpdateAction(recipient.getEncoded(), coinAmount);
+        WalletUpdateAction buyerWalletUpdateAction = new WalletUpdateAction(recipient.getEncoded(), coinAmount, lastKoinValue);
         walletUpdateActions.add(buyerWalletUpdateAction);
 
         return walletUpdateActions;
     }
 
     @Transactional
-    public List<WalletUpdateAction> sellTransaction(Map<PublicKey, Double> owners, PublicKey seller, double coinAmount) {
+    public List<WalletUpdateAction> sellTransaction(Map<PublicKey, Double> owners, PublicKey seller, double coinAmount, double lastKoinValue) {
         List<WalletUpdateAction> walletUpdateActions = new ArrayList<>();
 
         List<UTXO> utxosToUtilize = new LinkedList<>();
@@ -170,7 +170,7 @@ public class KoinManager {
 
         owners.forEach((buyerKey, amountToOutput) -> {
             transaction.addOutput(amountToOutput, buyerKey);
-            walletUpdateActions.add(new WalletUpdateAction(buyerKey.getEncoded(), amountToOutput));
+            walletUpdateActions.add(new WalletUpdateAction(buyerKey.getEncoded(), amountToOutput, lastKoinValue));
         });
 
         transaction.calculateHash();
@@ -179,7 +179,7 @@ public class KoinManager {
         List<UTXO> newUtxos = createNewUtxos(transaction);
         utxoRepository.saveAll(newUtxos);
 
-        WalletUpdateAction buyerWalletUpdateAction = new WalletUpdateAction(seller.getEncoded(), -coinAmount);
+        WalletUpdateAction buyerWalletUpdateAction = new WalletUpdateAction(seller.getEncoded(), -coinAmount, lastKoinValue);
         walletUpdateActions.add(buyerWalletUpdateAction);
 
         return walletUpdateActions;

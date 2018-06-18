@@ -2,31 +2,28 @@ package donkey.koin.transaction.donkey_kong_transaction.crypto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 
 import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Getter
 public class PotentialTransaction {
     private List<MiniTransaction> usersToTakeMoneyFromToAmount;
     private byte[] recipient;
     private double amount;
+    private double lastKoinValue;
 
     public PotentialTransaction(@JsonProperty("usersToTakeMoneyFromToAmount") List<MiniTransaction> usersToTakeMoneyFromToAmount,
                                 @JsonProperty("recipient") byte[] recipient,
-                                @JsonProperty("amount") double amount) {
+                                @JsonProperty("amount") double amount,
+                                @JsonProperty("lastKoinValue") double lastKoinValue) {
         this.usersToTakeMoneyFromToAmount = usersToTakeMoneyFromToAmount;
         this.recipient = recipient;
         this.amount = amount;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public byte[] getRecipient() {
-        return recipient;
+        this.lastKoinValue = lastKoinValue;
     }
 
     @JsonIgnore
@@ -40,17 +37,5 @@ public class PotentialTransaction {
         usersToTakeMoneyFromToAmount.forEach((transaction) ->
                 outputs.put(transaction.getPublicKey(), transaction.getAmount()));
         return outputs;
-    }
-
-    public void setUsersToTakeMoneyFromToAmount(List<MiniTransaction> usersToTakeMoneyFromToAmount) {
-        this.usersToTakeMoneyFromToAmount = usersToTakeMoneyFromToAmount;
-    }
-
-    public void setRecipient(byte[] recipient) {
-        this.recipient = recipient;
-    }
-
-    public void setAmount(double amount) {
-        this.amount = amount;
     }
 }

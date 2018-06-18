@@ -35,7 +35,7 @@ public class TransactionApplyController {
     @RequestMapping(method = POST)
     public String potentiallyPersistTransaction(@RequestBody PotentialTransaction potentialTransaction) {
         List<WalletUpdateAction> walletUpdateActions = koinManager.addTransaction(potentialTransaction.getOutputsMap(), potentialTransaction.getRecipientPublicKey(),
-                potentialTransaction.getAmount());
+                potentialTransaction.getAmount(), potentialTransaction.getLastKoinValue());
 
         Gson gsonBuilder = new GsonBuilder().setPrettyPrinting().create();
         String json = gsonBuilder.toJson(walletUpdateActions);
@@ -45,7 +45,7 @@ public class TransactionApplyController {
     @RequestMapping(method = POST, value = "/sell")
     public List<WalletUpdateAction> sellTransaction(@RequestBody PotentialTransaction potentialTransaction) {
         List<WalletUpdateAction> walletUpdateActions = koinManager.sellTransaction(potentialTransaction.getOutputsMap(), potentialTransaction.getRecipientPublicKey(),
-                potentialTransaction.getAmount());
+                potentialTransaction.getAmount(), potentialTransaction.getLastKoinValue());
 
         return walletUpdateActions;
     }

@@ -1,7 +1,6 @@
 package donkey.koin.transaction.donkey_kong_transaction;
 
 import donkey.koin.transaction.donkey_kong_transaction.crypto.Transaction;
-import donkey.koin.transaction.donkey_kong_transaction.crypto.TxHandler;
 import donkey.koin.transaction.donkey_kong_transaction.entities.UTXO;
 import donkey.koin.transaction.donkey_kong_transaction.koin.KoinManager;
 import donkey.koin.transaction.donkey_kong_transaction.repo.TransactionRepository;
@@ -16,7 +15,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.security.KeyPair;
 import java.security.PublicKey;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
@@ -64,7 +66,7 @@ public class DonkeyKongTransactionApplicationTests {
         map.put(koinManager.getKeyPair().getPublic(), 4.56d);
 
         // when
-        koinManager.addTransaction(map, keyPair1.getPublic(), 4.56d);
+        koinManager.addTransaction(map, keyPair1.getPublic(), 4.56d, 0);
         List<Transaction> transactions = transactionRepository.findAll();
 
         // then
@@ -88,8 +90,8 @@ public class DonkeyKongTransactionApplicationTests {
         map2.put(koinManager.getKeyPair().getPublic(), 200d);
 
         // when
-        koinManager.addTransaction(map1, keyPair1.getPublic(), 500d);
-        koinManager.addTransaction(map2, keyPair2.getPublic(), 600d);
+        koinManager.addTransaction(map1, keyPair1.getPublic(), 500d, 0);
+        koinManager.addTransaction(map2, keyPair2.getPublic(), 600d, 0);
         List<Transaction> transactions = transactionRepository.findAll();
 
         // then
@@ -109,7 +111,7 @@ public class DonkeyKongTransactionApplicationTests {
         map.put(koinManager.getKeyPair().getPublic(), 4.56d);
 
         // when
-        koinManager.addTransaction(map, keyPair1.getPublic(), 4.56d);
+        koinManager.addTransaction(map, keyPair1.getPublic(), 4.56d, 0);
         List<UTXO> utxos = utxoRepository.findAll();
 
         // then
@@ -141,7 +143,7 @@ public class DonkeyKongTransactionApplicationTests {
         utxoRepository.saveAll(sellerUtxos);
 
         // when
-        koinManager.sellTransaction(sellersMap, sellerPublicKey, 6);
+        koinManager.sellTransaction(sellersMap, sellerPublicKey, 6, 0);
 
         //then
         List<UTXO> utxos = utxoRepository.findAll();
