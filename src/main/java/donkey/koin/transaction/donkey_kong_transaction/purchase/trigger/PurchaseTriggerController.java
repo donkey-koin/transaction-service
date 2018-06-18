@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/triggers")
@@ -27,4 +29,11 @@ public class PurchaseTriggerController {
         this.repository.save(trigger);
         log.info(trigger.toString());
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/{username}")
+    public List<PurchaseTrigger> get(@PathVariable("username") String username) {
+        return repository.findAllByUsernameEquals(username);
+    }
+
+
 }

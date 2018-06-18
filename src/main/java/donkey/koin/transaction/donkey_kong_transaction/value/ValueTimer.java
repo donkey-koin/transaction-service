@@ -116,6 +116,7 @@ public class ValueTimer {
             try {
                 response = restTemplate.postForObject(purchaseUrl, request, String.class);
                 System.out.println(response);
+
                 triggerRepository.delete(trigger);
             } catch (Exception e) {
                 e.printStackTrace();
