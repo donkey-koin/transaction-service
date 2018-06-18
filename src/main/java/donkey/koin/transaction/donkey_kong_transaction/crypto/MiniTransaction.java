@@ -21,7 +21,7 @@ public class MiniTransaction {
 
     @JsonIgnore
     public PublicKey getPublicKey() {
-        return TxHandler.getRsaPublicKeyKeyFromBytes(publicKeyInBytes);
+        return KeyUtil.getRsaPublicKeyKeyFromBytes(publicKeyInBytes);
     }
 
     public double getAmount() {

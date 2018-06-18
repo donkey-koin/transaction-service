@@ -2,8 +2,6 @@ package donkey.koin.transaction.donkey_kong_transaction;
 
 import donkey.koin.transaction.donkey_kong_transaction.koin.KoinManager;
 import donkey.koin.transaction.donkey_kong_transaction.repo.PurchaseTriggerRepository;
-import donkey.koin.transaction.donkey_kong_transaction.repo.TransactionRepository;
-import donkey.koin.transaction.donkey_kong_transaction.repo.UTXORepository;
 import donkey.koin.transaction.donkey_kong_transaction.repo.ValueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

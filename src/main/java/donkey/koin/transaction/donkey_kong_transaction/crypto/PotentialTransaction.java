@@ -28,7 +28,7 @@ public class PotentialTransaction {
 
     @JsonIgnore
     public PublicKey getRecipientPublicKey() {
-        return TxHandler.getRsaPublicKeyKeyFromBytes(recipient);
+        return KeyUtil.getRsaPublicKeyKeyFromBytes(recipient);
     }
 
     @JsonIgnore

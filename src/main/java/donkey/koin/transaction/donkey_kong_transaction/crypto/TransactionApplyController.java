@@ -1,11 +1,10 @@
 package donkey.koin.transaction.donkey_kong_transaction.crypto;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import donkey.koin.transaction.donkey_kong_transaction.koin.KoinManager;
 import donkey.koin.transaction.donkey_kong_transaction.koin.WalletUpdateAction;
 import donkey.koin.transaction.donkey_kong_transaction.repo.TransactionRepository;
 import org.apache.commons.lang.ArrayUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,28 +32,24 @@ public class TransactionApplyController {
     }
 
     @RequestMapping(method = POST)
-    public String potentiallyPersistTransaction(@RequestBody PotentialTransaction potentialTransaction) {
+    public ResponseEntity potentiallyPersistTransaction(@RequestBody PotentialTransaction potentialTransaction) {
         List<WalletUpdateAction> walletUpdateActions = koinManager.addTransaction(potentialTransaction.getOutputsMap(), potentialTransaction.getRecipientPublicKey(),
                 potentialTransaction.getAmount(), potentialTransaction.getLastKoinValue());
 
-        Gson gsonBuilder = new GsonBuilder().setPrettyPrinting().create();
-        String json = gsonBuilder.toJson(walletUpdateActions);
-        return json;
+        return ResponseEntity.ok(walletUpdateActions);
     }
 
     @RequestMapping(method = POST, value = "/sell")
-    public List<WalletUpdateAction> sellTransaction(@RequestBody PotentialTransaction potentialTransaction) {
+    public ResponseEntity sellTransaction(@RequestBody PotentialTransaction potentialTransaction) {
         List<WalletUpdateAction> walletUpdateActions = koinManager.sellTransaction(potentialTransaction.getOutputsMap(), potentialTransaction.getRecipientPublicKey(),
                 potentialTransaction.getAmount(), potentialTransaction.getLastKoinValue());
 
-        return walletUpdateActions;
+        return ResponseEntity.ok(walletUpdateActions);
     }
 
     @RequestMapping(method = GET)
     public List<Transaction> getAllTransactions() {
-        List<Transaction> transactions = transactionRepository.findAll();
-        System.out.println(transactions);
-        return transactions;
+        return transactionRepository.findAll();
     }
 
     @RequestMapping(method = POST, path = "/find")

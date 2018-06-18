@@ -1,6 +1,6 @@
 package donkey.koin.transaction.donkey_kong_transaction.crypto;
 
-import donkey.koin.transaction.donkey_kong_transaction.entities.UTXO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -20,7 +20,7 @@ import java.util.Arrays;
 public class Transaction {
 
     @Id
-    /** hash of the transaction, its unique id */
+    @JsonIgnore
     private String hashId;
     private byte[] hash;
     private ArrayList<Input> inputs;
@@ -32,18 +32,10 @@ public class Transaction {
     @Setter
     public static class Input {
 
+        @JsonIgnore
         private String id;
-        /**
-         * hash of the Transaction whose output is being used
-         */
         public byte[] prevTxHash;
-        /**
-         * used output's index in the previous transaction
-         */
         public int outputIndex;
-        /**
-         * the signature produced to check validity
-         */
         public byte[] signature;
 
         public Input(byte[] prevTxHash, int outputIndex) {
@@ -54,28 +46,15 @@ public class Transaction {
             }
             this.outputIndex = outputIndex;
         }
-
-        public void addSignature(byte[] sig) {
-            if (sig == null)
-                signature = null;
-            else
-                signature = Arrays.copyOf(sig, sig.length);
-        }
     }
 
     @Getter
     @Setter
     public static class Output {
 
+        @JsonIgnore
         private String id;
-        /**
-         * value in bitcoins of the output
-         */
         public double value;
-        /**
-         * the address or public key of the recipient
-         */
-
         public byte[] address;
 
         public Output(double value, byte[] address) {
@@ -90,12 +69,6 @@ public class Transaction {
         timestamp = Instant.now();
     }
 
-    public Transaction(Transaction tx) {
-        hash = tx.hash.clone();
-        inputs = new ArrayList(tx.inputs);
-        outputs = new ArrayList<>(tx.outputs);
-    }
-
     public void addInput(Input input) {
         inputs.add(input);
     }
@@ -105,58 +78,7 @@ public class Transaction {
         outputs.add(op);
     }
 
-    public void removeInput(int index) {
-        inputs.remove(index);
-    }
-
-    public void removeInput(UTXO ut) {
-        for (int i = 0; i < inputs.size(); i++) {
-            Input in = inputs.get(i);
-            UTXO u = new UTXO(in.prevTxHash, in.outputIndex);
-            if (u.equals(ut)) {
-                inputs.remove(i);
-                return;
-            }
-        }
-    }
-
-    public byte[] getRawDataToSign(int index) {
-        // ith input and all outputs
-        ArrayList<Byte> sigData = new ArrayList<>();
-        if (index > inputs.size())
-            return null;
-        Input in = inputs.get(index);
-        byte[] prevTxHash = in.prevTxHash;
-        ByteBuffer b = ByteBuffer.allocate(Integer.SIZE / 8);
-        b.putInt(in.outputIndex);
-        byte[] outputIndex = b.array();
-        if (prevTxHash != null)
-            for (int i = 0; i < prevTxHash.length; i++)
-                sigData.add(prevTxHash[i]);
-        for (int i = 0; i < outputIndex.length; i++)
-            sigData.add(outputIndex[i]);
-        for (Output op : outputs) {
-            ByteBuffer bo = ByteBuffer.allocate(Double.SIZE / 8);
-            bo.putDouble(op.value);
-            byte[] value = bo.array();
-            byte[] addressBytes = op.address;
-            for (int i = 0; i < value.length; i++)
-                sigData.add(value[i]);
-
-            for (int i = 0; i < addressBytes.length; i++)
-                sigData.add(addressBytes[i]);
-        }
-        byte[] sigD = new byte[sigData.size()];
-        int i = 0;
-        for (Byte sb : sigData)
-            sigD[i++] = sb;
-        return sigD;
-    }
-
-    public void addSignature(byte[] signature, int index) {
-        inputs.get(index).addSignature(signature);
-    }
-
+    @JsonIgnore
     public byte[] getRawTx() {
         ArrayList<Byte> rawTx = new ArrayList<>();
         for (Input in : inputs) {
@@ -202,43 +124,5 @@ public class Transaction {
         } catch (NoSuchAlgorithmException x) {
             x.printStackTrace(System.err);
         }
-    }
-
-    public void setHash(byte[] h) {
-        hash = h;
-    }
-
-    public byte[] getHash() {
-        return hash;
-    }
-
-    public ArrayList<Input> getInputs() {
-        return inputs;
-    }
-
-    public ArrayList<Output> getOutputs() {
-        return outputs;
-    }
-
-    public Input getInput(int index) {
-        if (index < inputs.size()) {
-            return inputs.get(index);
-        }
-        return null;
-    }
-
-    public Output getOutput(int index) {
-        if (index < outputs.size()) {
-            return outputs.get(index);
-        }
-        return null;
-    }
-
-    public int numInputs() {
-        return inputs.size();
-    }
-
-    public int numOutputs() {
-        return outputs.size();
     }
 }
