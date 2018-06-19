@@ -18,7 +18,7 @@ public class PurchaseTrigger {
     private String id;
     private final String token;
     private final String username;
-    private final int limit;
-    private final int coinAmount;
+    private final double limit;
+    private final double coinAmount;
     private final PurchaseTriggerAction action;
 }

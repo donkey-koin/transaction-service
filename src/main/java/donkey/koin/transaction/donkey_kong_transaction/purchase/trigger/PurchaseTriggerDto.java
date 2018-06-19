@@ -12,10 +12,10 @@ public class PurchaseTriggerDto {
     private String token;
 
     @JsonProperty("limit")
-    private int limit;
+    private double limit;
 
     @JsonProperty("coinAmount")
-    private int coinAmount;
+    private double coinAmount;
 
     @JsonProperty("action")
     private PurchaseTriggerAction action;

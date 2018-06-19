@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface PurchaseTriggerRepository extends MongoRepository<PurchaseTrigger, String> {
 
-    List<PurchaseTrigger> findByLimitGreaterThanEqualAndActionEquals(int value, PurchaseTriggerAction trigger);
+    List<PurchaseTrigger> findByLimitGreaterThanEqualAndActionEquals(double value, PurchaseTriggerAction trigger);
 
-    List<PurchaseTrigger> findByLimitLessThanEqualAndActionEquals(int value, PurchaseTriggerAction trigger);
+    List<PurchaseTrigger> findByLimitLessThanEqualAndActionEquals(double value, PurchaseTriggerAction trigger);
 
     List<PurchaseTrigger> findAllByUsernameEquals(String username);
 }
