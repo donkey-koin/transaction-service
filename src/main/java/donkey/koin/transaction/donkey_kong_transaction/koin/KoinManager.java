@@ -37,6 +37,9 @@ public class KoinManager {
     @Autowired
     TransactionRepository transactionRepository;
 
+    @Value("${orchestration.host}")
+    private String orchestrationHost;
+
     private KeyPair keyPair;
 
     @Value("${donkey.koin.initial.value}")
@@ -73,14 +76,13 @@ public class KoinManager {
         utxoRepository.save(utxo);
 
         RestTemplate restTemplate = new RestTemplate();
-        String orchUrl = "http://localhost:5000/init";
         HttpEntity<InitTransaction> request;
         HttpHeaders headers;
         headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         request = new HttpEntity<>(new InitTransaction(initialAmount, keyPair.getPublic().getEncoded()), headers);
 
-        restTemplate.exchange(orchUrl, HttpMethod.POST, request, InitTransaction.class);
+        restTemplate.exchange(orchestrationHost, HttpMethod.POST, request, InitTransaction.class);
 
     }
 
